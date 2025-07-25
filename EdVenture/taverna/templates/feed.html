@@ -1,0 +1,145 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+Feed da Taverna
+{% endblock %}
+
+{% block body %}
+<body>
+  {% include "navbar.html" %}
+
+  <section class="container">
+    <h1>Feed principal</h1>
+    
+
+    <!-- Barra de busca com filtros -->
+    <form method="GET" action="{{ url_for('feed') }}" class="busca-tag">
+      <input
+        type="text"
+        name="tag"
+        placeholder="Buscar por tag"
+        class="input-tag"
+        value="{{ tag_filtro or '' }}"
+      >
+      <input
+        type="text"
+        name="categoria"
+        placeholder="Buscar por categoria"
+        class="input-tag"
+        value="{{ categoria_filtro or '' }}"
+      >
+      <input
+        type="text"
+        name="ano"
+        placeholder="Buscar por ano escolar"
+        class="input-tag"
+        value="{{ ano_filtro or '' }}"
+      >
+      <button type="submit" class="botao-busca">Buscar</button>
+
+      {% if tag_filtro or categoria_filtro or ano_filtro %}
+        <a href="{{ url_for('feed') }}" class="botao-limpar-tag">Limpar</a>
+      {% endif %}
+    </form>
+
+    <!-- Rankings -->
+    {% if tags_rank %}
+      <div class="ranking-tags">
+        <h3>🏆 Tags em Alta</h3>
+        <ul class="lista-tags">
+          {% for tag, count in tags_rank %}
+            <li>
+              <a href="{{ url_for('feed', tag=tag) }}" class="tag-ranking">
+                {{ tag }} <span class="badge">{{ count }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if categorias_rank %}
+      <div class="ranking-tags">
+        <h3>📚 Categorias Populares</h3>
+        <ul class="lista-tags">
+          {% for cat, count in categorias_rank %}
+            <li>
+              <a href="{{ url_for('feed', categoria=cat) }}" class="tag-ranking">
+                {{ cat }} <span class="badge">{{ count }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    {% if anos_rank %}
+      <div class="ranking-tags">
+        <h3>🏫 Anos Escolares em Destaque</h3>
+        <ul class="lista-tags">
+          {% for ano, count in anos_rank %}
+            <li>
+              <a href="{{ url_for('feed', ano=ano) }}" class="tag-ranking">
+                {{ ano }} <span class="badge">{{ count }}</span>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <!-- Lista de projetos -->
+    <div class="linha-feed">
+      {% for projeto in projetos %}
+        <div class="card-feed">
+          <h2>{{ projeto.titulo }}</h2>
+          <p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+          <p><strong>Descrição:</strong> {{ projeto.descricao }}</p>
+
+          <div class="tags">
+            <span class="tag-item">{{ projeto.categoria }}</span>
+            <span class="tag-item">{{ projeto.ano_escolar }}</span>
+            {% if projeto.tags %}
+              {% for tag in projeto.tags.split(',') %}
+                <span class="tag-item">{{ tag.strip() }}</span>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <p><a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}">Ver projeto completo</a></p>
+
+          <!-- Mídias vinculadas -->
+          {% for f in projeto.midias %}
+            {% set extensao = f.nome_arquivo.split('.')[-1].lower() %}
+            {% set icones = {
+              'pdf': 'lontra-pdf.png',
+              'doc': 'lontra-docx.png',
+              'docx': 'lontra-docx.png',
+              'ppt': 'lontra-pptx.png',
+              'pptx': 'lontra-pptx.png'
+            } %}
+            {% set icone = icones.get(extensao, 'lontra-default.png') %}
+
+            {% if extensao in ['jpg', 'jpeg', 'png'] %}
+              <img src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" class="imagem-feed">
+            {% elif extensao == 'mp4' %}
+              <video controls class="imagem-feed">
+                <source src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" type="video/mp4">
+              </video>
+            {% else %}
+              <div class="arquivo-generico">
+                <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed">
+                <a href="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" target="_blank">
+                  {{ f.nome_arquivo }}
+                </a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>Nenhum projeto encontrado.</p>
+      {% endfor %}
+    </div>
+  </section>
+</body>
+{% endblock %}

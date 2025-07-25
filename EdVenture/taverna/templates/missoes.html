@@ -1,0 +1,23 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+Página de missões
+{% endblock %}
+
+{% block body %}
+<body>
+    <h1>Missões</h1>
+    <a href="{{url_for('homepage')}}">voltar</a>
+    <div class="bloco-fantasia">
+  <img src="/static/fotos_site/lontra-missao.png" alt="Lontra Missão" class="img-personagem">
+  <div>
+    <h1>Missões da Semana</h1>
+    <ul>
+      <li>🎯 Criar atividade com vocabulário de animais.</li>
+      <li>📹 Postar vídeo explicando um jogo.</li>
+    </ul>
+  </div>
+</div>
+
+</body>
+{% endblock %}

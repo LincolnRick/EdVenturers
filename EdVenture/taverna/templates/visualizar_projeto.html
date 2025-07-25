@@ -1,0 +1,117 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+{{ projeto.titulo }}
+{% endblock %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+<section class="container">
+  <div class="bloco-projeto-individual">
+    <h1>{{ projeto.titulo }}</h1>
+    <p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+    <p><strong>Descrição:</strong> {{ projeto.descricao }}</p>
+    <p><strong>Tags:</strong> {{ projeto.tags or 'Nenhuma' }}</p>
+    <p><strong>Categoria:</strong> {{ projeto.categoria }}</p>
+    <p><strong>Ano Escolar:</strong> {{ projeto.ano_escolar }}</p>
+    <p><strong>Conteúdo:</strong></p>
+    <div class="conteudo-projeto">
+      {{ projeto.conteudo }}
+    </div>
+
+    <!-- Miniatura principal do projeto -->
+    {% if projeto.midias %}
+      {% set thumb = projeto.midias[0] %}
+      {% set tipo = thumb.tipo|lower %}
+      <div class="miniatura-principal">
+        {% set icones = {
+          'pdf': 'lontra-pdf.png',
+          'doc': 'lontra-docx.png',
+          'docx': 'lontra-docx.png',
+          'ppt': 'lontra-pptx.png',
+          'pptx': 'lontra-pptx.png'
+        } %}
+        {% set icone = icones.get(tipo, 'lontra-default.png') %}
+
+        {% if tipo in ['jpg', 'jpeg', 'png'] %}
+          <img src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}"
+               alt="Miniatura do projeto"
+               class="miniatura-imagem">
+        {% elif tipo == 'mp4' %}
+          <video controls class="miniatura-imagem">
+            <source src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}" type="video/mp4">
+          </video>
+        {% else %}
+          <div class="arquivo-generico">
+            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}"
+                 alt="Ícone do arquivo"
+                 class="miniatura-imagem">
+            <p>
+              <a href="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}"
+                 target="_blank"
+                 class="botao-projeto">
+                Ver o arquivo completo
+              </a>
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Mídias adicionais -->
+    <div class="midias-projeto">
+      {% for midia in projeto.midias[1:] %}
+        {% set tipo = midia.tipo|lower %}
+        {% set icones = {
+          'pdf': 'lontra-pdf.png',
+          'doc': 'lontra-docx.png',
+          'docx': 'lontra-docx.png',
+          'ppt': 'lontra-pptx.png',
+          'pptx': 'lontra-pptx.png'
+        } %}
+        {% set icone = icones.get(tipo, 'lontra-default.png') %}
+
+        {% if tipo in ['jpg', 'jpeg', 'png'] %}
+          <img src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" class="imagem-feed">
+        {% elif tipo == 'mp4' %}
+          <video controls class="imagem-feed">
+            <source src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" type="video/mp4">
+          </video>
+        {% else %}
+          <div class="arquivo-generico">
+            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed">
+            <a href="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" target="_blank">
+              {{ midia.nome_arquivo }}
+            </a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Comentários -->
+    <div class="comentarios">
+      <h3>Comentários:</h3>
+      {% for comentario in projeto.comentarios %}
+        <div class="comentario-bloco">
+          <strong>{{ comentario.usuario.username }}:</strong>
+          <pre class="comentario-texto">{{ comentario.texto }}</pre>
+        </div>
+      {% endfor %}
+      {% if projeto.comentarios|length == 0 %}
+        <p>Sem comentários ainda.</p>
+      {% endif %}
+    </div>
+
+    <!-- Formulário de Comentário -->
+    {% if current_user.is_authenticated %}
+      <form method="POST" class="form-comentario">
+        {{ form_comentario.csrf_token }}
+        <input type="hidden" name="id_projeto" value="{{ projeto.id }}">
+        {{ form_comentario.texto(rows=3, placeholder="Deixe seu comentário...", class="input") }}
+        {{ form_comentario.botao_comentario(class="botao-login") }}
+      </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

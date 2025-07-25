@@ -1,0 +1,56 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+    Crie sua conta - EdVenture
+{% endblock %}
+
+{% block formulario %}
+<section class="formulario-container" style="margin-top: 0; padding-top: 0px;">
+  <div class="formulario-bloco">
+    <h1 class="formulario-titulo">Crie sua conta</h1>
+
+    <form method="POST" class="formulario-registro">
+      {{ form.csrf_token }}
+
+      <div class="campo-form">
+        {{ form.email.label(class="form-label") }}
+        {{ form.email(class="form-input") }}
+      </div>
+
+      <div class="campo-form">
+        {{ form.username.label(class="form-label") }}
+        {{ form.username(class="form-input") }}
+      </div>
+
+      <div class="campo-form">
+        {{ form.senha.label(class="form-label") }}
+        {{ form.senha(class="form-input") }}
+      </div>
+
+      <div class="campo-form">
+        {{ form.confirmacao_senha.label(class="form-label") }}
+        {{ form.confirmacao_senha(class="form-input") }}
+      </div>
+<div class="campo-form">
+  {{ form.avatar.label(class="form-label") }}
+  <div class="escolha-avatar">
+    {% for subfield in form.avatar %}
+      <label class="opcao-avatar">
+        {{ subfield }}  <!-- renderiza o <input type="radio" ...> -->
+        <img src="{{ url_for('static', filename='avatares/' ~ subfield.data) }}" alt="Avatar">
+      </label>
+    {% endfor %}
+  </div>
+</div>
+      <div class="campo-form botao-formulario">
+        {{ form.botao_confirmacao(class="botao-login") }}
+      </div>
+    </form>
+
+    <p class="texto-login">
+      Já tem uma conta?
+      <a href="{{ url_for('homepage') }}" class="link-login">Faça login</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

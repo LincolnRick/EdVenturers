@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    {% block titulo %}
+    EdVenture
+    {% endblock %}
+  </title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+
+
+</head>
+
+{% block body %}
+<body>
+  <!-- Header -->
+  <header>
+    
+    <nav>
+      <div class="logo-pinterest">
+        <img
+          src="{{ url_for('static', filename='fotos_site/lontra-croft.png') }}"
+          alt="Logo Lontra Croft"
+          height="40"
+        />
+        <h1>EdVenture</h1>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="container">
+    <div class="container-popup">
+      <div class="popup">
+        
+        <h2> Bem-vindo, EdVentureiro!</h2>
+        <p>
+          Descubra, Crie, Conecte: Sua Jornada no Ensino de Inglês Começa Aqui.
+        </p>
+
+        {% block formulario %}
+        <form method="POST" class="div-input">
+          {{ form.csrf_token }}
+
+          <div class="div-input">
+            <label class="label">{{ form.email.label.text }}</label>
+            {{ form.email(class="input") }}
+
+            <label class="label">{{ form.senha.label.text }}</label>
+            {{ form.senha(class="input") }}
+          </div>
+
+          <div class="div-botao">
+            {{ form.botao_confirmacao(class="botao-login") }}
+          </div>
+
+          <a href="/criarconta" class="link-criarconta">Criar Conta</a>
+        </form>
+        {% endblock %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="rodape">
+    &copy; 2025 LincolnTech - English Teacher Quest. Todos os direitos reservados.
+  </footer>
+</body>
+{% endblock %}
+</html>
+<script>
+  const toggleBtn = document.getElementById('navbar-toggle');
+  const navLinks = document.getElementById('navbar-links');
+
+  toggleBtn.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+  });
+</script>

@@ -1,0 +1,19 @@
+<h1>{{ projeto.titulo }}</h1>
+<p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+<p>{{ projeto.descricao }}</p>
+<pre>{{ projeto.conteudo }}</pre>
+
+<h3>Comentários:</h3>
+{% for comentario in projeto.comentarios %}
+    <p><strong>{{ comentario.usuario.username }}:</strong> {{ comentario.texto }}</p>
+{% else %}
+    <p>Sem comentários ainda.</p>
+{% endfor %}
+
+{% if current_user.is_authenticated %}
+<form method="POST">
+    {{ form_comentario.csrf_token }}
+    {{ form_comentario.texto(rows=3) }}
+    {{ form_comentario.botao_comentario() }}
+</form>
+{% endif %}

@@ -1,0 +1,30 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+Novo Projeto
+{% endblock %}
+
+{% block body %}
+<body>
+  {% include "navbar.html" %}
+  <section class="container">
+    <h1>Publicar novo projeto</h1>
+    <form method="POST" enctype="multipart/form-data" class="form-projeto">
+      {{ form.csrf_token }}
+      {{ form.titulo(placeholder="Título do Projeto", class="input") }}
+      {{ form.descricao(placeholder="Descrição", class="input") }}
+      {{ form.conteudo(placeholder="Conteúdo adicional", class="input") }}
+      {{ form.categoria(class="input") }}
+      {{ form.ano_escolar(class="input") }}
+      {{ form.tags(placeholder="Tags (mínimo 1)", class="input") }}
+      {{ form.arquivos(class="input-arquivo", multiple=true) }}
+      <div class="div-input">
+  <label class="label" for="arquivos">Upload de Arquivos</label>
+  {{ form.arquivos(class="input", multiple=True) }}
+</div>
+
+      {{ form.botao_confirmacao(class="botao-login") }}
+    </form>
+  </section>
+</body>
+{% endblock %}

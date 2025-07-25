@@ -1,0 +1,27 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <!-- Logo e título à esquerda -->
+<div class="navbar-logo">
+  <img src="{{ url_for('static', filename='fotos_site/lontra-croft.png') }}" alt="Logo Lontra Croft" class="logo-lontra">
+  <span class="navbar-title">EdVenture</span>
+</div>
+
+
+    <!-- Botão de menu para mobile -->
+    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
+
+    <!-- Links da navbar à direita -->
+    <div class="navbar-links" id="nav-links">
+      <a href="{{ url_for('feed') }}">Feed</a>
+      <a href="{{ url_for('perfil', id_usuario=current_user.id) }}">Perfil</a>
+      <a href="{{ url_for('novo_projeto') }}">Novo Projeto</a>
+      <a href="{{ url_for('logout') }}">Sair</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('nav-links').classList.toggle('show');
+  }
+</script>
