@@ -1,5 +1,5 @@
-from taverna import app
-from taverna.routes import *
+from EdVenture.taverna import app
+from EdVenture.taverna.routes import *
 
 # os cadastros utilizarão "SQL ALCHEMY DO FLASK"
 # os formulários utilizarão "WTF FORMS FLASK  "
