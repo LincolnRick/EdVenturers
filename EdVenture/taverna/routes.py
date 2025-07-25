@@ -1,9 +1,9 @@
-from EdVenture.taverna import app, database, bcrypt
-from EdVenture.taverna.forms import (
+from taverna import app, database, bcrypt
+from taverna.forms import (
     FormLogin, FormCriarConta, FormProjeto,
     FormComentario, FormComentarioProjeto
 )
-from EdVenture.taverna.models import (
+from taverna.models import (
     Usuario, Projeto, Comentario, ComentarioProjeto, Midia
 )
 from flask import render_template, url_for, redirect, request
@@ -11,7 +11,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
 
-from EdVenture.taverna.utils import (
+from taverna.utils import (
     get_ranking_de_tags,
     get_ranking_de_categorias,
     get_ranking_de_anos

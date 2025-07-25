@@ -13,7 +13,12 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 
 # Banco de dados
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///comunidade.db"
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(basedir, '..', 'instance', 'comunidade.db')}"
+
+
+
 
 # pasta padrão de upload de fotos
 # # onde são armazenadas as fotos
@@ -32,4 +37,4 @@ login_manager = LoginManager(app)
 ## view e routes são a mesma coisa
 login_manager.login_view = "homepage"
 
-from EdVenture.taverna import routes
+from taverna import routes
