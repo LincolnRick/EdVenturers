@@ -1,7 +1,7 @@
 # taverna/utils.py
 
 from collections import Counter
-from taverna.models import Projeto
+from EdVenture.taverna.models import Projeto
 
 
 def get_ranking_de_tags(limit=10):

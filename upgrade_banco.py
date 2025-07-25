@@ -1,6 +1,6 @@
-from taverna import database, app
+from EdVenture.taverna import database, app
 from sqlalchemy import inspect, text
-from taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuario
+from EdVenture.taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuario
 
 with app.app_context():
     inspector = inspect(database.engine)

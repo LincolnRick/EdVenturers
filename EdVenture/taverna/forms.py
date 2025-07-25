@@ -6,7 +6,7 @@ from wtforms import (
     StringField, PasswordField, SubmitField, TextAreaField, MultipleFileField, RadioField
 )
 from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
-from taverna.models import Usuario
+from EdVenture.taverna.models import Usuario
 
 # ---------- Formulário de Login ----------
 class FormLogin(FlaskForm):
