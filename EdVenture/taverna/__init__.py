@@ -32,4 +32,4 @@ login_manager = LoginManager(app)
 ## view e routes são a mesma coisa
 login_manager.login_view = "homepage"
 
-from taverna import routes
+from EdVenture.taverna import routes
