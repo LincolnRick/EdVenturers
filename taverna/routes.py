@@ -201,3 +201,7 @@ def visualizar_projeto(id_projeto):
         projeto=projeto,
         form_comentario=form_comentario
     )
+
+@app.route('/sponsors')
+def sponsors():
+    return render_template('sponsors.html')
