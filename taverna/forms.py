@@ -69,20 +69,31 @@ class FormProjeto(FlaskForm):
     conteudo = TextAreaField("Conteúdo adicional")
     
     categoria = SelectField("Categoria", choices=[
-        ("História", "História"),
-        ("Matemática", "Matemática"),
-        ("Português", "Português"),
-        ("Ciências", "Ciências"),
-        ("Geografia", "Geografia"),
+        ('artes', 'Artes'),
+        ('musica', 'Música'),
+        ('matematica', 'Matemática'),
+        ('historia', 'História'),
+        ('geografia', 'Geografia'),
+        ('ingles', 'Inglês ESL'),
+        ('socioemocional', 'Socioemocional'),
+        ('tecnologia', 'Tecnologia'),
         ("Outra", "Outra")
     ], validators=[DataRequired()])
     
     ano_escolar = SelectField("Ano Escolar", choices=[
-        ("1º Ano", "1º Ano"),
-        ("2º Ano", "2º Ano"),
-        ("3º Ano", "3º Ano"),
-        ("4º Ano", "4º Ano"),
-        ("5º Ano", "5º Ano")
+        ('ed_infantil', 'Ed. Infantil'),
+        ('1o_ano', '1º ano'),
+        ('2o_ano', '2º ano'),
+        ('3o_ano', '3º ano'),
+        ('4o_ano', '4º ano'),
+        ('5o_ano', '5º ano'),
+        ('6o_ano', '6º ano'),
+        ('7o_ano', '7º ano'),
+        ('8o_ano', '8º ano'),
+        ('9o_ano', '9º ano'),
+        ('1o_em', '1º EM'),
+        ('2o_em', '2º EM'),
+        ('3o_em', '3º EM')
     ], validators=[DataRequired()])
     
     tags = StringField("Tags (mínimo 1)", validators=[DataRequired(), Length(min=2)])

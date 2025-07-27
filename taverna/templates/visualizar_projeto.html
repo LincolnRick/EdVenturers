@@ -20,98 +20,181 @@
       {{ projeto.conteudo }}
     </div>
 
-    <!-- Miniatura principal do projeto -->
+    {% set icones = {
+      'pdf': 'lontra-pdf.png',
+      'doc': 'lontra-docx.png',
+      'docx': 'lontra-docx.png',
+      'ppt': 'lontra-pptx.png',
+      'pptx': 'lontra-pptx.png'
+    } %}
+
+    <!-- Miniatura principal -->
     {% if projeto.midias %}
       {% set thumb = projeto.midias[0] %}
       {% set tipo = thumb.tipo|lower %}
-      <div class="miniatura-principal">
-        {% set icones = {
-          'pdf': 'lontra-pdf.png',
-          'doc': 'lontra-docx.png',
-          'docx': 'lontra-docx.png',
-          'ppt': 'lontra-pptx.png',
-          'pptx': 'lontra-pptx.png'
-        } %}
-        {% set icone = icones.get(tipo, 'lontra-default.png') %}
+      {% set icone = icones.get(tipo, 'lontra-default.png') %}
 
+      <div class="miniatura-principal">
         {% if tipo in ['jpg', 'jpeg', 'png'] %}
           <img src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}"
-               alt="Miniatura do projeto"
-               class="miniatura-imagem">
+               class="miniatura-imagem"
+               onclick="abrirImagem('{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}', 0)">
         {% elif tipo == 'mp4' %}
           <video controls class="miniatura-imagem">
             <source src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}" type="video/mp4">
           </video>
         {% else %}
           <div class="arquivo-generico">
-            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}"
-                 alt="Ícone do arquivo"
-                 class="miniatura-imagem">
-            <p>
-              <a href="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}"
-                 target="_blank"
-                 class="botao-projeto">
-                Ver o arquivo completo
-              </a>
-            </p>
+            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="miniatura-imagem">
+            <p><a href="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}" target="_blank" class="botao-projeto">Ver o arquivo completo</a></p>
           </div>
         {% endif %}
       </div>
     {% endif %}
 
-    <!-- Mídias adicionais -->
-    <div class="midias-projeto">
+    <!-- Galeria -->
+    <div class="midias-galeria">
       {% for midia in projeto.midias[1:] %}
         {% set tipo = midia.tipo|lower %}
-        {% set icones = {
-          'pdf': 'lontra-pdf.png',
-          'doc': 'lontra-docx.png',
-          'docx': 'lontra-docx.png',
-          'ppt': 'lontra-pptx.png',
-          'pptx': 'lontra-pptx.png'
-        } %}
         {% set icone = icones.get(tipo, 'lontra-default.png') %}
 
-        {% if tipo in ['jpg', 'jpeg', 'png'] %}
-          <img src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" class="imagem-feed">
-        {% elif tipo == 'mp4' %}
-          <video controls class="imagem-feed">
-            <source src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" type="video/mp4">
-          </video>
-        {% else %}
-          <div class="arquivo-generico">
-            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed">
-            <a href="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" target="_blank">
-              {{ midia.nome_arquivo }}
-            </a>
-          </div>
-        {% endif %}
+        <div class="galeria-item">
+          {% if tipo in ['jpg', 'jpeg', 'png'] %}
+            <img src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}"
+                 class="miniatura-imagem"
+                 onclick="abrirImagem('{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}', {{ loop.index }})">
+          {% elif tipo == 'mp4' %}
+            <video controls class="miniatura-imagem">
+              <source src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" type="video/mp4">
+            </video>
+          {% else %}
+            <div class="arquivo-generico">
+              <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="miniatura-imagem">
+              <a href="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" target="_blank">
+                {{ midia.nome_arquivo }}
+              </a>
+            </div>
+          {% endif %}
+        </div>
       {% endfor %}
     </div>
 
     <!-- Comentários -->
-    <div class="comentarios">
-      <h3>Comentários:</h3>
-      {% for comentario in projeto.comentarios %}
-        <div class="comentario-bloco">
-          <strong>{{ comentario.usuario.username }}:</strong>
-          <pre class="comentario-texto">{{ comentario.texto }}</pre>
-        </div>
-      {% endfor %}
-      {% if projeto.comentarios|length == 0 %}
-        <p>Sem comentários ainda.</p>
-      {% endif %}
-    </div>
+<hr class="divisor-comentarios">
 
-    <!-- Formulário de Comentário -->
+<div class="comentarios-com-caixa">
+  <h3 class="titulo-comentario">💬 Comentários</h3>
+
+  {% if projeto.comentarios %}
+    {% for comentario in projeto.comentarios %}
+      <div class="comentario-cartao">
+        <div class="comentario-avatar">
+          <img src="{{ url_for('static', filename='avatares/' ~ comentario.usuario.avatar or 'default.png') }}"
+               alt="Avatar"
+               class="comentario-avatar-img">
+        </div>
+        <div class="comentario-conteudo">
+          <div class="comentario-topo">
+            <span class="comentario-autor">{{ comentario.usuario.username }}</span>
+          </div>
+          <div class="comentario-corpo">
+            {{ comentario.texto }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="comentario-vazio">Nenhum comentário ainda.</p>
+  {% endif %}
+</div>
+
+
+
+    <!-- Formulário -->
     {% if current_user.is_authenticated %}
       <form method="POST" class="form-comentario">
         {{ form_comentario.csrf_token }}
         <input type="hidden" name="id_projeto" value="{{ projeto.id }}">
-        {{ form_comentario.texto(rows=3, placeholder="Deixe seu comentário...", class="input") }}
+        {{ form_comentario.texto(rows=3, placeholder="Deixe seu comentário...", class="input", id="campo-comentario") }}
         {{ form_comentario.botao_comentario(class="botao-login") }}
       </form>
+      <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const campo = document.getElementById("campo-comentario");
+  if (!campo) return;
+
+  const formulario = campo.closest("form");
+
+  campo.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (campo.value.trim() !== "") {
+        formulario.submit();
+      }
+    }
+  });
+});
+</script>
+
     {% endif %}
   </div>
 </section>
+
+<!-- Modal + Navegação -->
+<div id="popup-img" onclick="fecharImagem()" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  flex-direction: column;
+">
+  <button onclick="imagemAnterior(event)" style="position: absolute; left: 2%; font-size: 2rem; color: white; background: none; border: none; cursor: pointer;">⟵</button>
+  <img id="imagem-popup" src="" alt="Imagem ampliada" style="
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #fff;
+  ">
+  <button onclick="imagemProxima(event)" style="position: absolute; right: 2%; font-size: 2rem; color: white; background: none; border: none; cursor: pointer;">⟶</button>
+</div>
+
+<script>
+let imagensProjeto = [
+  {% for midia in projeto.midias if midia.tipo.lower() in ['jpg', 'jpeg', 'png'] %}
+    "{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}",
+  {% endfor %}
+];
+let imagemAtual = 0;
+
+function abrirImagem(src, index) {
+  imagemAtual = index;
+  document.getElementById("imagem-popup").src = src;
+  document.getElementById("popup-img").style.display = "flex";
+}
+function fecharImagem() {
+  document.getElementById("popup-img").style.display = "none";
+}
+function imagemAnterior(event) {
+  event.stopPropagation();
+  imagemAtual = (imagemAtual - 1 + imagensProjeto.length) % imagensProjeto.length;
+  document.getElementById("imagem-popup").src = imagensProjeto[imagemAtual];
+}
+function imagemProxima(event) {
+  event.stopPropagation();
+  imagemAtual = (imagemAtual + 1) % imagensProjeto.length;
+  document.getElementById("imagem-popup").src = imagensProjeto[imagemAtual];
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharImagem();
+  else if (e.key === 'ArrowRight') imagemProxima(e);
+  else if (e.key === 'ArrowLeft') imagemAnterior(e);
+});
+</script>
 {% endblock %}

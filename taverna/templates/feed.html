@@ -10,39 +10,27 @@ Feed da Taverna
 
   <section class="container">
     <h1>Feed principal</h1>
-    
 
-    <!-- Barra de busca com filtros -->
-    <form method="GET" action="{{ url_for('feed') }}" class="busca-tag">
+    <!-- 🔍 Barra de busca com filtros unificados -->
+    <form method="GET" action="{{ url_for('feed') }}" class="form-busca-tag">
       <input
         type="text"
         name="tag"
-        placeholder="Buscar por tag"
+        placeholder="Buscar por palavra-chave"
         class="input-tag"
         value="{{ tag_filtro or '' }}"
       >
-      <input
-        type="text"
-        name="categoria"
-        placeholder="Buscar por categoria"
-        class="input-tag"
-        value="{{ categoria_filtro or '' }}"
-      >
-      <input
-        type="text"
-        name="ano"
-        placeholder="Buscar por ano escolar"
-        class="input-tag"
-        value="{{ ano_filtro or '' }}"
-      >
-      <button type="submit" class="botao-busca">Buscar</button>
+
+        
+
+      <button type="submit" class="botao-busca">🔍 Filtrar</button>
 
       {% if tag_filtro or categoria_filtro or ano_filtro %}
         <a href="{{ url_for('feed') }}" class="botao-limpar-tag">Limpar</a>
       {% endif %}
     </form>
 
-    <!-- Rankings -->
+    <!-- Rankings (mantido) -->
     {% if tags_rank %}
       <div class="ranking-tags">
         <h3>🏆 Tags em Alta</h3>
@@ -88,7 +76,7 @@ Feed da Taverna
       </div>
     {% endif %}
 
-    <!-- Lista de projetos -->
+    <!-- 📂 Lista de projetos -->
     <div class="linha-feed">
       {% for projeto in projetos %}
         <div class="card-feed">
@@ -109,7 +97,8 @@ Feed da Taverna
           <p><a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}">Ver projeto completo</a></p>
 
           <!-- Mídias vinculadas -->
-          {% for f in projeto.midias %}
+          {% if projeto.midias %}
+            {% set f = projeto.midias[0] %}
             {% set extensao = f.nome_arquivo.split('.')[-1].lower() %}
             {% set icones = {
               'pdf': 'lontra-pdf.png',
@@ -134,7 +123,7 @@ Feed da Taverna
                 </a>
               </div>
             {% endif %}
-          {% endfor %}
+          {% endif %}
         </div>
       {% else %}
         <p>Nenhum projeto encontrado.</p>

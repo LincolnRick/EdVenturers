@@ -1,16 +1,16 @@
 <nav class="navbar">
   <div class="navbar-container">
-    <!-- Logo e título à esquerda -->
-<div class="navbar-logo">
-  <img src="{{ url_for('static', filename='fotos_site/lontra-croft.png') }}" alt="Logo Lontra Croft" class="logo-lontra">
-  <span class="navbar-title">EdVenture</span>
-</div>
+    
+    <!-- Logo e Título -->
+    <div class="navbar-logo">
+      <img src="{{ url_for('static', filename='fotos_site/lontra-croft.png') }}" alt="Logo Lontra Croft" class="logo-lontra">
+      <span class="navbar-title">EdVenture</span>
+    </div>
 
+    <!-- Botão mobile -->
+    <button class="navbar-toggle" aria-label="Abrir menu" onclick="toggleMenu()">☰</button>
 
-    <!-- Botão de menu para mobile -->
-    <button class="navbar-toggle" onclick="toggleMenu()">☰</button>
-
-    <!-- Links da navbar à direita -->
+    <!-- Links de navegação -->
     <div class="navbar-links" id="nav-links">
       <a href="{{ url_for('feed') }}">Feed</a>
       <a href="{{ url_for('perfil', id_usuario=current_user.id) }}">Perfil</a>
@@ -23,6 +23,16 @@
 
 <script>
   function toggleMenu() {
-    document.getElementById('nav-links').classList.toggle('show');
+    const links = document.getElementById('nav-links');
+    links.classList.toggle('show');
   }
+
+  // Fecha o menu ao clicar em um link (mobile UX)
+  document.addEventListener('click', function(e) {
+    const nav = document.getElementById('nav-links');
+    const toggle = document.querySelector('.navbar-toggle');
+    if (!toggle.contains(e.target) && !nav.contains(e.target)) {
+      nav.classList.remove('show');
+    }
+  });
 </script>
