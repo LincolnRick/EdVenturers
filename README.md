@@ -51,22 +51,22 @@ O **EdVenture** permite que educadores compartilhem projetos, recebam comentári
 
 
 
--EdVenture/
--├── app.py # Aplicação Flask principal
--├── models.py # Modelos do banco de dados
--├── forms.py # Formulários (WTForms)
--├── routes.py # Rotas principais
--├── comunidade.db # Banco de dados SQLite
--├── static/ # Arquivos estáticos (CSS, JS, imagens)
--│ └── avatares/
--├── templates/ # Templates HTML
--│ ├── base.html
--│ ├── perfil.html
--│ ├── feed.html
--│ ├── missoes.html
--│ ├── taverna.html
--│ └── visualizar_projeto.html
--└── README.md
+- EdVenture/
+- ├── app.py # Aplicação Flask principal
+- ├── models.py # Modelos do banco de dados
+- ├── forms.py # Formulários (WTForms)
+- ├── routes.py # Rotas principais
+- ├── comunidade.db # Banco de dados SQLite
+- ├── static/ # Arquivos estáticos (CSS, JS, imagens)
+- │ └── avatares/
+- ├── templates/ # Templates HTML
+- │ ├── base.html
+- │ ├── perfil.html
+- │ ├── feed.html
+- │ ├── missoes.html
+- │ ├── taverna.html
+- │ └── visualizar_projeto.html
+- └── README.md
 
 
 ---
@@ -79,15 +79,18 @@ O **EdVenture** permite que educadores compartilhem projetos, recebam comentári
    cd edventure
 
 2. **Crie e ative um ambiente virtual**:
-python -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # Linux/Mac
+   venv\Scripts\activate      # Windows
 
 3. **Instale as dependências**:
-pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
 4. **Execute a aplicação**:
-flask run
+   ```bash
+   flask run
 
 5. **Acesse no navegador**:
 👉 http://127.0.0.1:5000
