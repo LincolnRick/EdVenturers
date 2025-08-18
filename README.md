@@ -51,22 +51,22 @@ O **EdVenture** permite que educadores compartilhem projetos, recebam comentári
 
 
 
-EdVenture/
-├── app.py # Aplicação Flask principal
-├── models.py # Modelos do banco de dados
-├── forms.py # Formulários (WTForms)
-├── routes.py # Rotas principais
-├── comunidade.db # Banco de dados SQLite
-├── static/ # Arquivos estáticos (CSS, JS, imagens)
-│ └── avatares/
-├── templates/ # Templates HTML
-│ ├── base.html
-│ ├── perfil.html
-│ ├── feed.html
-│ ├── missoes.html
-│ ├── taverna.html
-│ └── visualizar_projeto.html
-└── README.md
+-EdVenture/
+-├── app.py # Aplicação Flask principal
+-├── models.py # Modelos do banco de dados
+-├── forms.py # Formulários (WTForms)
+-├── routes.py # Rotas principais
+-├── comunidade.db # Banco de dados SQLite
+-├── static/ # Arquivos estáticos (CSS, JS, imagens)
+-│ └── avatares/
+-├── templates/ # Templates HTML
+-│ ├── base.html
+-│ ├── perfil.html
+-│ ├── feed.html
+-│ ├── missoes.html
+-│ ├── taverna.html
+-│ └── visualizar_projeto.html
+-└── README.md
 
 
 ---
