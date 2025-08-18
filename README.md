@@ -110,11 +110,9 @@ Faça push para a branch (git push origin minha-feature).
 
 Abra um Pull Request.
 
-📜 Licença
-
-Este projeto está licenciado sob a MIT License.
 
 ✨ Créditos
 
-Projeto desenvolvido por Gustavo Oliveira e colaboradores.
+Projeto desenvolvido por Gustavo Oliveira e Erick Lincoln.
+
 Inspirado na ideia de unir educação, gamificação e tecnologia para transformar a jornada dos professores.
