@@ -43,47 +43,58 @@
             margin-top: 0.5em;
             font-weight: bold;
         }
-        footer {
-            background-color: #eee;
+        /* Estilo do botão do WhatsApp */
+        .whatsapp-link {
+            display: block;              /* vira bloco */
+            margin: 15px auto 0 auto;    /* centraliza no card */
+            background-color: #25d366;
+            color: #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
             text-align: center;
-            padding: 1em;
-            margin-top: 2em;
+            line-height: 50px;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+        .whatsapp-link:hover {
+            background-color: #20b955;
         }
     </style>
+    <!-- Font Awesome para o ícone do WhatsApp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
-
 </head>
 <body>
     <header>
         <div style="text-align: center; margin-top: 1em;">
-    <button onclick="window.history.back()" style="
-        background-color: #563d7c;
-        color: white;
-        border: none;
-        padding: 0.5em 1em;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1em;
-    ">← Voltar</button>
-</div>
-
+            <button onclick="window.history.back()" style="
+                background-color: #563d7c;
+                color: white;
+                border: none;
+                padding: 0.5em 1em;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1em;
+            ">← Voltar</button>
+        </div>
         <h1>Aliados da Jornada</h1>
         <p>Conheça os parceiros que apoiam a missão de transformar o ensino!</p>
     </header>
+
     <div class="sponsors-container">
         <div class="sponsor-card">
-            <img src="/static/avatares/avatar1.jpeg" alt="Patrocinador 1">
-            <a href="https://example.com">Sponsor One</a>
-        </div>
-        <div class="sponsor-card">
-            <img src="/static/avatares/avatar2.jpeg" alt="Patrocinador 2">
-            <a href="https://example.com">Sponsor Two</a>
-        </div>
-        <div class="sponsor-card">
-            <img src="/static/avatares/avatar3.jpeg" alt="Patrocinador 3">
-            <a href="https://example.com">Sponsor Three</a>
+            <img src="/static/avatares/image.png" alt="Patrocinador 1">
+            <a href="https://example.com">Gustavo Oliveira</a>
+
+            <!-- Botão do WhatsApp centralizado -->
+            <a class="whatsapp-link" href="https://web.whatsapp.com/send?phone=55 11 99465-2004" target="_blank">
+                <i class="fa fa-whatsapp"></i>
+            </a>
         </div>
     </div>
+
     <footer>
         <p>© 2025 English Teacher Quest — Todos os direitos reservados</p>
     </footer>
