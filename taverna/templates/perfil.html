@@ -12,7 +12,10 @@ Perfil - {{ usuario.username }}
     <img src="{{ url_for('static', filename='avatares/' ~ usuario.avatar) }}"
          alt="Avatar do usuário"
          class="avatar-perfil">
-    <h1>Perfil do usuário: {{ usuario.username }}</h1>
+    <div>
+      <h1>Perfil do usuário: {{ usuario.username }}</h1>
+      <p>Pontos: {{ usuario.pontos }}</p>
+    </div>
   </div>
 
   <div class="conteudo">
