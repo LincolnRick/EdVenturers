@@ -1,19 +1,60 @@
-<h1>{{ projeto.titulo }}</h1>
-<p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
-<p>{{ projeto.descricao }}</p>
-<pre>{{ projeto.conteudo }}</pre>
+{% extends "homepage.html" %}
 
-<h3>Comentários:</h3>
-{% for comentario in projeto.comentarios %}
-    <p><strong>{{ comentario.usuario.username }}:</strong> {{ comentario.texto }}</p>
-{% else %}
-    <p>Sem comentários ainda.</p>
-{% endfor %}
+{% block titulo %}
+{{ projeto.titulo }}
+{% endblock %}
 
-{% if current_user.is_authenticated %}
-<form method="POST">
-    {{ form_comentario.csrf_token }}
-    {{ form_comentario.texto(rows=3) }}
-    {{ form_comentario.botao_comentario() }}
-</form>
-{% endif %}
+{% block body %}
+<body>
+  {% include "navbar.html" %}
+
+  <section class="container">
+    <div class="bloco-projeto-individual">
+      <h1>{{ projeto.titulo }}</h1>
+      <p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+      <p>{{ projeto.descricao }}</p>
+
+      <div class="conteudo-projeto">
+        {{ projeto.conteudo }}
+      </div>
+
+      <hr class="divisor-comentarios">
+
+      <div class="comentarios-com-caixa">
+        <h3 class="titulo-comentario">💬 Comentários</h3>
+
+        {% if projeto.comentarios %}
+          {% for comentario in projeto.comentarios %}
+            <div class="comentario-cartao">
+              <div class="comentario-avatar">
+                <img src="{{ url_for('static', filename='avatares/' ~ (comentario.usuario.avatar or 'default.png')) }}"
+                     alt="Avatar"
+                     class="comentario-avatar-img">
+              </div>
+              <div class="comentario-conteudo">
+                <div class="comentario-topo">
+                  <span class="comentario-autor">{{ comentario.usuario.username }}</span>
+                </div>
+                <div class="comentario-corpo">
+                  {{ comentario.texto }}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="comentario-vazio">Sem comentários ainda.</p>
+        {% endif %}
+      </div>
+
+      {% if current_user.is_authenticated %}
+        <form method="POST" class="form-comentario">
+          {{ form_comentario.csrf_token }}
+          {{ form_comentario.texto(rows=3, placeholder="Deixe seu comentário...", class="input") }}
+          {{ form_comentario.botao_comentario(class="botao-login") }}
+        </form>
+      {% endif %}
+    </div>
+  </section>
+</body>
+{% endblock %}
+
