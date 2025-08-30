@@ -20,12 +20,19 @@
       {{ projeto.conteudo }}
     </div>
 
+    {% if current_user.is_authenticated and current_user.id == projeto.id_usuario %}
+      <form method="POST" action="{{ url_for('deletar_projeto', id_projeto=projeto.id) }}" class="form-deletar-projeto">
+        {{ form_comentario.csrf_token }}
+        <button type="submit" class="botao-login">Excluir Projeto</button>
+      </form>
+    {% endif %}
+
     {% set icones = {
       'pdf': 'lontra-pdf.png',
       'doc': 'lontra-docx.png',
       'docx': 'lontra-docx.png',
-      'ppt': 'lontra-pptx.png',
-      'pptx': 'lontra-pptx.png',
+      'ppt': 'lontra-croft.png',
+      'pptx': 'lontra-croft.png',
       'csv': 'lontra-csv.png',
       'xlsx': 'lontra-xlsx.png'
     } %}
@@ -34,7 +41,7 @@
     {% if projeto.midias %}
       {% set thumb = projeto.midias[0] %}
       {% set tipo = thumb.tipo|lower %}
-      {% set icone = icones.get(tipo, 'lontra-default.png') %}
+      {% set icone = icones.get(tipo, 'lontra-croft.png') %}
 
       <div class="miniatura-principal">
         {% if tipo in ['jpg', 'jpeg', 'png'] %}
@@ -58,7 +65,7 @@
     <div class="midias-galeria">
       {% for midia in projeto.midias[1:] %}
         {% set tipo = midia.tipo|lower %}
-        {% set icone = icones.get(tipo, 'lontra-default.png') %}
+        {% set icone = icones.get(tipo, 'lontra-croft.png') %}
 
         <div class="galeria-item">
           {% if tipo in ['jpg', 'jpeg', 'png'] %}
@@ -102,6 +109,15 @@
           <div class="comentario-corpo">
             {{ comentario.texto }}
           </div>
+          {% if current_user.is_authenticated and comentario.usuario.id == current_user.id %}
+            <div class="comentario-acoes">
+              <a href="{{ url_for('editar_comentario', id_comentario=comentario.id) }}">Editar</a>
+              <form action="{{ url_for('deletar_comentario', id_comentario=comentario.id) }}" method="POST" style="display:inline;">
+                {{ form_comentario.csrf_token }}
+                <button type="submit" class="botao-login">Excluir</button>
+              </form>
+            </div>
+          {% endif %}
         </div>
       </div>
     {% endfor %}

@@ -104,12 +104,12 @@ Feed da Taverna
               'pdf': 'lontra-pdf.png',
               'doc': 'lontra-docx.png',
               'docx': 'lontra-docx.png',
-              'ppt': 'lontra-pptx.png',
-              'pptx': 'lontra-pptx.png',
+              'ppt': 'lontra-croft.png',
+              'pptx': 'lontra-croft.png',
               'csv': 'lontra-csv.png',
               'xlsx': 'lontra-xlsx.png'
             } %}
-            {% set icone = icones.get(extensao, 'lontra-default.png') %}
+            {% set icone = icones.get(extensao, 'lontra-croft.png') %}
 
             {% if extensao in ['jpg', 'jpeg', 'png'] %}
               <img src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" class="imagem-feed">

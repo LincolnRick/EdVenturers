@@ -23,8 +23,9 @@ Perfil - {{ usuario.username }}
     <h2>Projetos Publicados</h2>
     {% if usuario.projetos %}
       {% for projeto in usuario.projetos %}
-        <a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}" class="bloco-projeto-link">
-          <div class="bloco-projeto">
+        <div class="bloco-projeto-wrapper">
+          <a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}" class="bloco-projeto-link">
+            <div class="bloco-projeto">
             <h3>{{ projeto.titulo }}</h3>
             <p>{{ projeto.descricao }}</p>
             <div class="tags">
@@ -52,12 +53,12 @@ Perfil - {{ usuario.username }}
                     'pdf': 'lontra-pdf.png',
                     'doc': 'lontra-docx.png',
                     'docx': 'lontra-docx.png',
-                    'ppt': 'lontra-pptx.png',
-                    'pptx': 'lontra-pptx.png',
+                    'ppt': 'lontra-croft.png',
+                    'pptx': 'lontra-croft.png',
                     'csv': 'lontra-csv.png',
                     'xlsx': 'lontra-xlsx.png'
                   } %}
-                  {% set icone = icones.get(tipo, 'lontra-default.png') %}
+                  {% set icone = icones.get(tipo, 'lontra-croft.png') %}
                   <div class="arquivo-generico">
                     <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" alt="Arquivo {{ tipo }}">
                     <p>{{ thumb.nome_arquivo }}</p>
@@ -65,8 +66,15 @@ Perfil - {{ usuario.username }}
                 {% endif %}
               </div>
             {% endif %}
-          </div>
-        </a>
+            </div>
+          </a>
+          {% if current_user.is_authenticated and current_user.id == usuario.id %}
+            <form method="POST" action="{{ url_for('deletar_projeto', id_projeto=projeto.id) }}" class="form-deletar-projeto">
+              {{ form_comentario.csrf_token }}
+              <button type="submit" class="botao-login">Excluir</button>
+            </form>
+          {% endif %}
+        </div>
       {% endfor %}
     {% else %}
       <p>Este usuário ainda não publicou nenhum projeto.</p>
