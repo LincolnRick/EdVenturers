@@ -9,12 +9,13 @@ Perfil - {{ usuario.username }}
 
 <section class="container">
   <div class="bloco-add-img" style="display: flex; align-items: center; gap: 20px;">
-    <img src="{{ url_for('static', filename='avatares/' ~ usuario.avatar) }}"
-         alt="Avatar do usuário"
-         class="avatar-perfil">
+    <div class="avatar-life" style="--progress: {{ usuario.pontos|default(0) }}%;">
+      <img src="{{ url_for('static', filename='avatares/' ~ usuario.avatar) }}"
+           alt="Avatar do usuário"
+           class="avatar-perfil">
+    </div>
     <div>
       <h1>Perfil do usuário: {{ usuario.username }}</h1>
-      <p>Pontos: {{ usuario.pontos }}</p>
     </div>
   </div>
 
