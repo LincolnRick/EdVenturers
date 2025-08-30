@@ -12,7 +12,11 @@ Bem vindo a taverna
         <h2>Ranking de Aventureiros</h2>
         <ol>
         {% for usuario in ranking_usuarios %}
-            <li>{{ usuario.username }} - {{ usuario.pontos }} pts</li>
+            <li>
+              <a href="{{ url_for('perfil', id_usuario=usuario.id) }}">{{ usuario.username }}</a>
+              <span class="badge-nivel">Lv {{ niveis[usuario.id] }}</span>
+              - {{ usuario.pontos }} pts
+            </li>
         {% else %}
             <li>Nenhum usuário pontuado ainda.</li>
         {% endfor %}

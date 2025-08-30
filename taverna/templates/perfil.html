@@ -9,10 +9,11 @@ Perfil - {{ usuario.username }}
 
 <section class="container">
   <div class="bloco-add-img" style="display: flex; align-items: center; gap: 20px;">
-    <div class="avatar-life" style="--progress: {{ usuario.pontos|default(0) }}%;">
+    <div class="avatar-life" style="--progress: {{ progresso }}%;">
       <img src="{{ url_for('static', filename='avatares/' ~ usuario.avatar) }}"
            alt="Avatar do usuário"
            class="avatar-perfil">
+      <span class="badge-nivel">Lv {{ nivel }}</span>
     </div>
     <div>
       <h1>Perfil do usuário: {{ usuario.username }}</h1>

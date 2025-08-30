@@ -81,7 +81,10 @@ Feed da Taverna
       {% for projeto in projetos %}
         <div class="card-feed">
           <h2>{{ projeto.titulo }}</h2>
-          <p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+          <p><strong>Autor:</strong>
+            <a href="{{ url_for('perfil', id_usuario=projeto.autor.id) }}">{{ projeto.autor.username }}</a>
+            <span class="badge-nivel">Lv {{ niveis_autores[projeto.autor.id] }}</span>
+          </p>
           <p><strong>Descrição:</strong> {{ projeto.descricao }}</p>
 
           <div class="tags">
