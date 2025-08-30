@@ -1,9 +1,19 @@
+"""Helper script to ensure the database schema is up to date.
+
+This module is executed during application start-up and can also be run
+directly. It checks for the existence of required tables and columns,
+creating them when necessary so that the application can operate without
+manual migrations.
+"""
+
 from taverna import database, app
 from sqlalchemy import inspect, text
 from taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuario
 
 
 def upgrade():
+    """Verify tables and columns, creating them if missing."""
+
     with app.app_context():
         inspector = inspect(database.engine)
         tabelas_existentes = inspector.get_table_names()
