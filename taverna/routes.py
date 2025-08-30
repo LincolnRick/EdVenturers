@@ -6,7 +6,7 @@ from taverna.forms import (
 from taverna.models import (
     Usuario, Projeto, Comentario, ComentarioProjeto, Midia
 )
-from flask import render_template, url_for, redirect, request
+from flask import render_template, url_for, redirect, request, abort
 from flask_login import login_required, login_user, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
@@ -216,6 +216,64 @@ def visualizar_projeto(id_projeto):
         projeto=projeto,
         form_comentario=form_comentario
     )
+
+
+# ---------------- Edição de comentário em projeto ----------------
+@app.route("/comentario/<int:id_comentario>/editar", methods=["GET", "POST"])
+@login_required
+def editar_comentario(id_comentario):
+    comentario = ComentarioProjeto.query.get_or_404(id_comentario)
+    if comentario.id_usuario != current_user.id:
+        abort(403)
+
+    form = FormComentario()
+    if form.validate_on_submit():
+        comentario.texto = form.texto.data
+        database.session.commit()
+        return redirect(url_for("visualizar_projeto", id_projeto=comentario.id_projeto))
+    elif request.method == "GET":
+        form.texto.data = comentario.texto
+    return render_template("editar_comentario.html", form=form, comentario=comentario)
+
+
+# ---------------- Remoção de comentário em projeto ----------------
+@app.route("/comentario/<int:id_comentario>/deletar", methods=["POST"])
+@login_required
+def deletar_comentario(id_comentario):
+    comentario = ComentarioProjeto.query.get_or_404(id_comentario)
+    if comentario.id_usuario != current_user.id:
+        abort(403)
+    id_projeto = comentario.id_projeto
+    database.session.delete(comentario)
+    database.session.commit()
+    return redirect(url_for("visualizar_projeto", id_projeto=id_projeto))
+
+
+# ---------------- Remoção de projeto (punitivo leve) ----------------
+@app.route("/projeto/<int:id_projeto>/deletar", methods=["POST"])
+@login_required
+def deletar_projeto(id_projeto):
+    projeto = Projeto.query.get_or_404(id_projeto)
+    if projeto.id_usuario != current_user.id:
+        abort(403)
+
+    for midia in projeto.midias:
+        caminho = os.path.join(app.root_path, 'static', 'projetos_midias', midia.nome_arquivo)
+        if os.path.exists(caminho):
+            os.remove(caminho)
+        database.session.delete(midia)
+
+    for comentario in projeto.comentarios:
+        database.session.delete(comentario)
+
+    database.session.delete(projeto)
+
+    usuario = Usuario.query.get(current_user.id)
+    if usuario:
+        usuario.pontos = max(0, (usuario.pontos or 0) - 5)
+
+    database.session.commit()
+    return redirect(url_for("perfil", id_usuario=current_user.id))
 
 @app.route('/sponsors')
 def sponsors():

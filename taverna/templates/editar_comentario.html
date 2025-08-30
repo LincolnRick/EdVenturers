@@ -1,0 +1,17 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+Editar Comentário
+{% endblock %}
+
+{% block body %}
+{% include "navbar.html" %}
+<section class="container">
+  <h2>Editar Comentário</h2>
+  <form method="POST">
+    {{ form.csrf_token }}
+    {{ form.texto(rows=4, class="input") }}
+    {{ form.botao_comentario(class="botao-login") }}
+  </form>
+</section>
+{% endblock %}
