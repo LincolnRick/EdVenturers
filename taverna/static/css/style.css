@@ -1383,6 +1383,19 @@ video.miniatura-imagem {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
+.bloco-projeto-individual {
+  background-color: #fffaf2;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 40px;
+}
+
+.conteudo-projeto {
+  margin-top: 1rem;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
 .divisor-comentarios {
   border: none;
   border-top: 4px solid #d8c8f0;
