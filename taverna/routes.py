@@ -14,7 +14,8 @@ from werkzeug.utils import secure_filename
 from taverna.utils import (
     get_ranking_de_tags,
     get_ranking_de_categorias,
-    get_ranking_de_anos
+    get_ranking_de_anos,
+    calcular_nivel
 )
 
 
@@ -97,6 +98,8 @@ def perfil(id_usuario):
     form_projeto = FormProjeto()
     form_comentario = FormComentario()
 
+    nivel, progresso = calcular_nivel(usuario.pontos)
+
     # Criação de novo projeto com arquivos
     if current_user.id == usuario.id and form_projeto.validate_on_submit():
         criar_projeto(form_projeto, current_user.id)
@@ -106,7 +109,9 @@ def perfil(id_usuario):
         "perfil.html",
         usuario=usuario,
         form=form_projeto,
-        form_comentario=form_comentario
+        form_comentario=form_comentario,
+        nivel=nivel,
+        progresso=progresso
     )
 
 
@@ -132,6 +137,11 @@ def feed():
         query = query.filter(Projeto.ano_escolar == ano_filtro)
 
     projetos = query.order_by(Projeto.data_criacao.desc()).all()
+
+    niveis_autores = {
+        projeto.autor.id: calcular_nivel(projeto.autor.pontos)[0]
+        for projeto in projetos
+    }
 
     # Rankings
     tags_rank = get_ranking_de_tags()
@@ -161,7 +171,8 @@ def feed():
         ano_filtro=ano_filtro,
         tags_rank=tags_rank,
         categorias_rank=categorias_rank,
-        anos_rank=anos_rank
+        anos_rank=anos_rank,
+        niveis_autores=niveis_autores
     )
 
 
@@ -169,7 +180,8 @@ def feed():
 @app.route("/taverna")
 def taverna():
     ranking_usuarios = Usuario.query.order_by(Usuario.pontos.desc()).limit(5).all()
-    return render_template("taverna.html", ranking_usuarios=ranking_usuarios)
+    niveis = {u.id: calcular_nivel(u.pontos)[0] for u in ranking_usuarios}
+    return render_template("taverna.html", ranking_usuarios=ranking_usuarios, niveis=niveis)
 
 @app.route("/missoes")
 def missoes():
