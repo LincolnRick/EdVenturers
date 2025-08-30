@@ -1,9 +1,9 @@
-"""Helper script to ensure the database schema is up to date.
+"""Script auxiliar para garantir que o esquema do banco esteja atualizado.
 
-This module is executed during application start-up and can also be run
-directly. It checks for the existence of required tables and columns,
-creating them when necessary so that the application can operate without
-manual migrations.
+Este módulo é executado durante a inicialização da aplicação e pode ser
+executado diretamente. Ele verifica a existência das tabelas e colunas
+necessárias, criando-as quando necessário para que a aplicação funcione
+sem migrações manuais.
 """
 
 from taverna import database, app
@@ -12,7 +12,7 @@ from taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuari
 
 
 def upgrade():
-    """Verify tables and columns, creating them if missing."""
+    """Verifica tabelas e colunas, criando-as se necessário."""
 
     with app.app_context():
         inspector = inspect(database.engine)
