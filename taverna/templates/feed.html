@@ -13,7 +13,9 @@ Feed da Taverna
 
     <!-- 🔍 Barra de busca com filtros unificados -->
     <form method="GET" action="{{ url_for('feed') }}" class="form-busca-tag">
+      <label for="tag-busca" class="sr-only">Buscar por palavra-chave</label>
       <input
+        id="tag-busca"
         type="text"
         name="tag"
         placeholder="Buscar por palavra-chave"
@@ -115,14 +117,14 @@ Feed da Taverna
             {% set icone = icones.get(extensao, 'lontra-croft.png') %}
 
             {% if extensao in ['jpg', 'jpeg', 'png'] %}
-              <img src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" class="imagem-feed">
+              <img src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" class="imagem-feed" alt="Mídia do projeto {{ projeto.titulo }}">
             {% elif extensao == 'mp4' %}
               <video controls class="imagem-feed">
                 <source src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" type="video/mp4">
               </video>
             {% else %}
               <div class="arquivo-generico">
-                <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed">
+                <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed" alt="Arquivo {{ f.nome_arquivo }}">
                 <a href="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" target="_blank">
                   {{ f.nome_arquivo }}
                 </a>
