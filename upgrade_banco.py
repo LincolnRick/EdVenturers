@@ -29,6 +29,8 @@ with app.app_context():
     colunas_usuario = [col['name'] for col in inspector.get_columns('usuario')]
     if 'avatar' not in colunas_usuario:
         database.session.execute(text("ALTER TABLE usuario ADD COLUMN avatar TEXT DEFAULT 'avatar1.jpeg'"))
+    if 'pontos' not in colunas_usuario:
+        database.session.execute(text("ALTER TABLE usuario ADD COLUMN pontos INTEGER DEFAULT 0"))
 
     database.session.commit()
     print("Banco verificado e atualizado com sucesso.")

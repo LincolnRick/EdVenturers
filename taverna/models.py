@@ -15,6 +15,7 @@ class Usuario(database.Model, UserMixin):
     senha = database.Column(database.String, nullable=False)
 
     avatar = database.Column(database.String, default="avatar1.jpeg")  # <- novo campo
+    pontos = database.Column(database.Integer, default=0)
 
     # Relacionamentos
     projetos = database.relationship("Projeto", backref="autor", lazy=True)
