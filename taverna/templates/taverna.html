@@ -8,5 +8,15 @@ Bem vindo a taverna
 <body>
     <h1>Taverna</h1>
     <a href="{{url_for('homepage')}}">voltar</a>
+    <section class="ranking">
+        <h2>Ranking de Aventureiros</h2>
+        <ol>
+        {% for usuario in ranking_usuarios %}
+            <li>{{ usuario.username }} - {{ usuario.pontos }} pts</li>
+        {% else %}
+            <li>Nenhum usuário pontuado ainda.</li>
+        {% endfor %}
+        </ol>
+    </section>
 </body>
 {% endblock %}

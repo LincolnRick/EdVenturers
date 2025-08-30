@@ -79,6 +79,12 @@ def criar_projeto(form_projeto, usuario_id):
             )
             database.session.add(midia)
     database.session.commit()
+
+    usuario = Usuario.query.get(usuario_id)
+    if usuario:
+        usuario.pontos = (usuario.pontos or 0) + 10
+        database.session.commit()
+
     return projeto
 
 # ---------------- Perfil com Upload de Projeto ----------------
@@ -138,6 +144,9 @@ def feed():
             id_midia=id_midia
         )
         database.session.add(novo_comentario)
+        usuario = Usuario.query.get(current_user.id)
+        if usuario:
+            usuario.pontos = (usuario.pontos or 0) + 2
         database.session.commit()
         return redirect(url_for("feed", tag=tag_filtro or None, categoria=categoria_filtro or None, ano=ano_filtro or None))
 
@@ -157,7 +166,8 @@ def feed():
 # ---------------- Rotas auxiliares ----------------
 @app.route("/taverna")
 def taverna():
-    return render_template("taverna.html")
+    ranking_usuarios = Usuario.query.order_by(Usuario.pontos.desc()).limit(5).all()
+    return render_template("taverna.html", ranking_usuarios=ranking_usuarios)
 
 @app.route("/missoes")
 def missoes():
@@ -187,12 +197,15 @@ def visualizar_projeto(id_projeto):
 
     if form_comentario.validate_on_submit():
         novo_comentario = ComentarioProjeto(
-    texto=form_comentario.texto.data,
-    id_usuario=current_user.id,
-    id_projeto=id_projeto
-)
+            texto=form_comentario.texto.data,
+            id_usuario=current_user.id,
+            id_projeto=id_projeto
+        )
 
         database.session.add(novo_comentario)
+        usuario = Usuario.query.get(current_user.id)
+        if usuario:
+            usuario.pontos = (usuario.pontos or 0) + 2
         database.session.commit()
         return redirect(url_for("visualizar_projeto", id_projeto=projeto.id))
 
