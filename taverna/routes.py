@@ -68,7 +68,9 @@ def criar_projeto(form_projeto, usuario_id):
     for arquivo in arquivos:
         if arquivo and arquivo.filename:
             nome_seguro = secure_filename(arquivo.filename)
-            caminho = os.path.join(app.root_path, 'static', 'projetos_midias', nome_seguro)
+            dir_midias = os.path.join(app.root_path, 'static', 'projetos_midias')
+            os.makedirs(dir_midias, exist_ok=True)
+            caminho = os.path.join(dir_midias, nome_seguro)
             arquivo.save(caminho)
             extensao = nome_seguro.rsplit('.', 1)[-1].lower()
             midia = Midia(

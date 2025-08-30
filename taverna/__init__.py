@@ -31,10 +31,12 @@ database = SQLAlchemy(app)
 # Criptografia de dados
 bcrypt = Bcrypt(app)
 
-
 login_manager = LoginManager(app)
 
 ## view e routes são a mesma coisa
 login_manager.login_view = "homepage"
+
+from upgrade_banco import upgrade as upgrade_banco
+upgrade_banco()
 
 from taverna import routes
