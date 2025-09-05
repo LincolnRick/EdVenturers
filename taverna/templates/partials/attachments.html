@@ -1,12 +1,24 @@
 <section class="bg-white rounded-2xl shadow p-6">
   <h2 class="text-lg font-semibold mb-3">Anexos</h2>
+  {% set icones = {
+    'pdf': 'lontra-pdf.png',
+    'doc': 'lontra-docx.png',
+    'docx': 'lontra-docx.png',
+    'ppt': 'lontra-croft.png',
+    'pptx': 'lontra-croft.png',
+    'csv': 'lontra-csv.png',
+    'xlsx': 'lontra-xlsx.png'
+  } %}
   <ul class="divide-y">
     {% for a in attachments %}
       {% set href = (url_for('static', filename=a.filepath) if a.filepath and not a.filepath.startswith('http') else a.filepath) %}
+      {% set filename = a.original_name or a.filepath %}
+      {% set ext = filename.split('.')[-1].lower() %}
+      {% set icone = icones.get(ext, 'lontra-croft.png') %}
       <li class="py-3 flex items-center gap-3">
-        <div class="w-9 h-9 rounded bg-gray-100 grid place-items-center text-gray-600 text-sm" aria-hidden="true">{{ (a.mime_type.split('/')[-1] if a.mime_type else 'file')[:4]|upper }}</div>
+        <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="w-9 h-9 object-contain" alt="Arquivo {{ ext }}" aria-hidden="true">
         <div class="flex-1 min-w-0">
-          <div class="truncate font-medium text-gray-900" title="{{ a.original_name or a.filepath }}">{{ a.original_name or a.filepath }}</div>
+          <div class="truncate font-medium text-gray-900" title="{{ filename }}">{{ filename }}</div>
           <div class="text-xs text-gray-500">{{ a.mime_type or 'arquivo' }}{% if a.size_kb %} • {{ a.size_kb }} KB{% endif %}</div>
         </div>
         <a href="{{ href }}" target="_blank" rel="noopener" class="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Abrir</a>
