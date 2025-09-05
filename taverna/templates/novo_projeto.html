@@ -1,30 +1,29 @@
 {% extends "homepage.html" %}
 
 {% block titulo %}
-Novo Projeto
+{% if projeto %}Editar Projeto{% else %}Novo Projeto{% endif %}
 {% endblock %}
 
 {% block body %}
 <body>
   {% include "navbar.html" %}
   <section class="container">
-    <h1>Publicar novo projeto</h1>
-    <form method="POST" enctype="multipart/form-data" class="form-projeto">
+    <h1>{% if projeto %}Editar projeto{% else %}Publicar novo projeto{% endif %}</h1>
+    <form method="POST" enctype="multipart/form-data" class="form-projeto" {% if projeto %}action="{{ url_for('editar_projeto', id_projeto=projeto.id) }}"{% endif %}>
       {{ form.csrf_token }}
       {{ form.titulo(placeholder="Título do Projeto", class="input") }}
       {{ form.descricao(placeholder="Descrição", class="input") }}
       {{ form.conteudo(placeholder="Conteúdo adicional", class="input") }}
-      {{ form.categoria(class="input") }}
-      {{ form.ano_escolar(class="input") }}
-      {{ form.tags(placeholder="Tags (mínimo 1)", class="input") }}
-      {{ form.arquivos(class="input-arquivo", multiple=true) }}
-      <div class="div-input">
-  <label class="label" for="arquivos">Upload de Arquivos</label>
-  {{ form.arquivos(class="input", multiple=True) }}
-</div>
+        {{ form.categoria(class="input") }}
+        {{ form.ano_escolar(class="input") }}
+        {{ form.tags(placeholder="Tags (mínimo 1)", class="input") }}
+        <div class="div-input">
+          <label class="label" for="arquivos">Upload de Arquivos</label>
+          {{ form.arquivos(class="input", multiple=True) }}
+        </div>
 
-      {{ form.botao_confirmacao(class="botao-login") }}
-    </form>
+        {{ form.botao_confirmacao('Salvar alterações' if projeto else 'Enviar Projeto', class="botao-login") }}
+      </form>
   </section>
 </body>
 {% endblock %}
