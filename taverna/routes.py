@@ -9,6 +9,7 @@ from taverna.models import (
 from flask import render_template, url_for, redirect, request, abort
 from flask_login import login_required, login_user, logout_user, current_user
 import os
+import mimetypes
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
 
@@ -260,6 +261,18 @@ def editar_projeto(id_projeto):
 def visualizar_projeto(id_projeto):
     projeto = Projeto.query.get_or_404(id_projeto)
     form_comentario = FormComentario()
+
+    projeto.title = projeto.titulo
+    midias = []
+    for m in projeto.midias:
+        caminho = f"projetos_midias/{m.nome_arquivo}"
+        mime_type, _ = mimetypes.guess_type(m.nome_arquivo)
+        midias.append({
+            "filepath": caminho,
+            "mime_type": mime_type,
+            "alt": m.nome_arquivo
+        })
+    projeto.media = midias
 
     if form_comentario.validate_on_submit():
         novo_comentario = ComentarioProjeto(

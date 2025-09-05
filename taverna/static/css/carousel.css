@@ -1,0 +1,28 @@
+.ev-carousel{position:relative;background:#fff;border-radius:16px;box-shadow:0 8px 20px rgba(16,24,40,.08);padding:12px}
+.ev-carousel__viewport{overflow:hidden;border-radius:12px}
+.ev-carousel__track{display:flex;gap:12px;will-change:transform;transition:transform .35s ease}
+.ev-carousel__slide{flex:0 0 100%;position:relative}
+.ev-carousel__media{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9;border-radius:12px;display:block}
+.ev-carousel__fallback{display:flex;align-items:center;justify-content:center;min-height:220px;background:#fafafa;border-radius:12px;color:#6b7280}
+.ev-carousel__nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:999px;border:none;background:rgba(17,24,39,.6);color:#fff;font-size:22px;display:grid;place-items:center;cursor:pointer}
+.ev-carousel__nav:focus{outline:2px solid #6366f1;outline-offset:2px}
+.ev-carousel__nav--prev{left:10px}
+.ev-carousel__nav--next{right:10px}
+.ev-carousel__dots{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.ev-carousel__dot{width:10px;height:10px;border-radius:999px;border:0;background:#e5e7eb;cursor:pointer}
+.ev-carousel__dot[aria-selected="true"]{background:#6366f1}
+
+@media (hover:hover){
+  .ev-carousel__nav:hover{background:rgba(17,24,39,.8)}
+}
+
+.ev-lightbox[hidden]{display:none}
+.ev-lightbox{position:fixed;inset:0;z-index:60;display:grid;place-items:center}
+.ev-lightbox__backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+.ev-lightbox__content{position:relative;max-width:min(96vw,1100px);width:100%;padding:12px}
+.ev-lightbox__stage{background:#000;border-radius:12px;display:grid;place-items:center;min-height:min(80vh,700px);overflow:hidden}
+.ev-lightbox__stage img, .ev-lightbox__stage video{max-width:100%;max-height:80vh}
+.ev-lightbox__close{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:999px;border:0;background:#fff;color:#111827;font-size:22px;cursor:pointer}
+.ev-lightbox__arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:999px;border:0;background:rgba(255,255,255,.9);cursor:pointer}
+.ev-lightbox__arrow--prev{left:8px}
+.ev-lightbox__arrow--next{right:8px}

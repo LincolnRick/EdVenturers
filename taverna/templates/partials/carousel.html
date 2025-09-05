@@ -1,0 +1,45 @@
+{% set _title = project.title or 'Galeria do projeto' %}
+<div class="ev-carousel" role="region" aria-roledescription="carousel" aria-label="Galeria: {{ _title }}">
+  <div class="ev-carousel__viewport" data-ev-carousel>
+    <ul class="ev-carousel__track">
+      {% for m in project.media %}
+      <li class="ev-carousel__slide" data-index="{{ loop.index0 }}">
+        {% set src = url_for('static', filename=m.filepath) if m.filepath and not m.filepath.startswith('http') else m.filepath %}
+        {% if m.mime_type and m.mime_type.startswith('video/') %}
+          <video class="ev-carousel__media" controls preload="metadata" aria-label="{{ m.alt or ('Vídeo - ' ~ _title) }}">
+            <source src="{{ src }}" type="{{ m.mime_type }}">
+            Seu navegador não suporta vídeo. <a href="{{ src }}" target="_blank" rel="noopener">Abrir vídeo</a>
+          </video>
+        {% elif m.mime_type and m.mime_type.startswith('image/') or (not m.mime_type) %}
+          <img class="ev-carousel__media" src="{{ src }}" alt="{{ m.alt or ('Imagem do projeto ' ~ _title) }}" loading="lazy" decoding="async">
+        {% else %}
+          <div class="ev-carousel__fallback">
+            Arquivo não visualizável. <a href="{{ src }}" target="_blank" rel="noopener">Abrir arquivo</a>
+          </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Controles (escondidos via JS/CSS se só houver 1 item) -->
+  <button class="ev-carousel__nav ev-carousel__nav--prev" type="button" aria-label="Slide anterior" data-ev-prev>&lsaquo;</button>
+  <button class="ev-carousel__nav ev-carousel__nav--next" type="button" aria-label="Próximo slide" data-ev-next>&rsaquo;</button>
+
+  <div class="ev-carousel__dots" role="tablist" aria-label="Indicadores de slides">
+    {% for m in project.media %}
+    <button class="ev-carousel__dot" role="tab" aria-label="Ir para slide {{ loop.index }}" aria-controls="slide-{{ loop.index }}" data-ev-dot="{{ loop.index0 }}"></button>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Modal/lightbox -->
+<div class="ev-lightbox" id="ev-lightbox" hidden aria-modal="true" role="dialog" aria-label="Visualização ampliada">
+  <div class="ev-lightbox__backdrop" data-ev-close></div>
+  <div class="ev-lightbox__content">
+    <button class="ev-lightbox__close" type="button" aria-label="Fechar" data-ev-close>×</button>
+    <button class="ev-lightbox__arrow ev-lightbox__arrow--prev" type="button" aria-label="Anterior" data-ev-lb-prev>&lsaquo;</button>
+    <div class="ev-lightbox__stage"></div>
+    <button class="ev-lightbox__arrow ev-lightbox__arrow--next" type="button" aria-label="Próximo" data-ev-lb-next>&rsaquo;</button>
+  </div>
+</div>
