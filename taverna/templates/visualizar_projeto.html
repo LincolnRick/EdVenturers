@@ -1,0 +1,218 @@
+{% extends "homepage.html" %}
+
+{% block titulo %}
+{{ projeto.titulo }}
+{% endblock %}
+
+{% block body %}
+{% include "navbar.html" %}
+
+<section class="container">
+  <div class="bloco-projeto-individual">
+    <h1>{{ projeto.titulo }}</h1>
+    <p><strong>Autor:</strong> {{ projeto.autor.username }}</p>
+    <p><strong>Descrição:</strong> {{ projeto.descricao }}</p>
+    <p><strong>Tags:</strong> {{ projeto.tags or 'Nenhuma' }}</p>
+    <p><strong>Categoria:</strong> {{ projeto.categoria }}</p>
+    <p><strong>Ano Escolar:</strong> {{ projeto.ano_escolar }}</p>
+    <p><strong>Conteúdo:</strong></p>
+    <div class="conteudo-projeto">
+      {{ projeto.conteudo }}
+    </div>
+
+    {% if current_user.is_authenticated and current_user.id == projeto.id_usuario %}
+      <form method="POST" action="{{ url_for('deletar_projeto', id_projeto=projeto.id) }}" class="form-deletar-projeto">
+        {{ form_comentario.csrf_token }}
+        <button type="submit" class="botao-login">Excluir Projeto</button>
+      </form>
+    {% endif %}
+
+    {% set icones = {
+      'pdf': 'lontra-pdf.png',
+      'doc': 'lontra-docx.png',
+      'docx': 'lontra-docx.png',
+      'ppt': 'lontra-croft.png',
+      'pptx': 'lontra-croft.png',
+      'csv': 'lontra-csv.png',
+      'xlsx': 'lontra-xlsx.png'
+    } %}
+
+    <!-- Miniatura principal -->
+    {% if projeto.midias %}
+      {% set thumb = projeto.midias[0] %}
+      {% set tipo = thumb.tipo|lower %}
+      {% set icone = icones.get(tipo, 'lontra-croft.png') %}
+
+      <div class="miniatura-principal">
+        {% if tipo in ['jpg', 'jpeg', 'png'] %}
+          <img src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}"
+               class="miniatura-imagem"
+               onclick="abrirImagem('{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}', 0)">
+        {% elif tipo == 'mp4' %}
+          <video controls class="miniatura-imagem">
+            <source src="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}" type="video/mp4">
+          </video>
+        {% else %}
+          <div class="arquivo-generico">
+            <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="miniatura-imagem">
+            <p><a href="{{ url_for('static', filename='projetos_midias/' ~ thumb.nome_arquivo) }}" target="_blank" class="botao-projeto">Ver o arquivo completo</a></p>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <!-- Galeria -->
+    <div class="midias-galeria">
+      {% for midia in projeto.midias[1:] %}
+        {% set tipo = midia.tipo|lower %}
+        {% set icone = icones.get(tipo, 'lontra-croft.png') %}
+
+        <div class="galeria-item">
+          {% if tipo in ['jpg', 'jpeg', 'png'] %}
+            <img src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}"
+                 class="miniatura-imagem"
+                 onclick="abrirImagem('{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}', {{ loop.index }})">
+          {% elif tipo == 'mp4' %}
+            <video controls class="miniatura-imagem">
+              <source src="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" type="video/mp4">
+            </video>
+          {% else %}
+            <div class="arquivo-generico">
+              <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="miniatura-imagem">
+              <a href="{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}" target="_blank">
+                {{ midia.nome_arquivo }}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Comentários -->
+<hr class="divisor-comentarios">
+
+<div class="comentarios-com-caixa">
+  <h3 class="titulo-comentario">💬 Comentários</h3>
+
+  {% if projeto.comentarios %}
+    {% for comentario in projeto.comentarios %}
+      <div class="comentario-cartao">
+        <div class="comentario-avatar">
+          <img src="{{ url_for('static', filename='avatares/' ~ comentario.usuario.avatar or 'default.png') }}"
+               alt="Avatar"
+               class="comentario-avatar-img">
+        </div>
+        <div class="comentario-conteudo">
+          <div class="comentario-topo">
+            <span class="comentario-autor">{{ comentario.usuario.username }}</span>
+          </div>
+          <div class="comentario-corpo">
+            {{ comentario.texto }}
+          </div>
+          {% if current_user.is_authenticated and comentario.usuario.id == current_user.id %}
+            <div class="comentario-acoes">
+              <a href="{{ url_for('editar_comentario', id_comentario=comentario.id) }}">Editar</a>
+              <form action="{{ url_for('deletar_comentario', id_comentario=comentario.id) }}" method="POST" style="display:inline;">
+                {{ form_comentario.csrf_token }}
+                <button type="submit" class="botao-login">Excluir</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="comentario-vazio">Nenhum comentário ainda.</p>
+  {% endif %}
+</div>
+
+
+
+    <!-- Formulário -->
+    {% if current_user.is_authenticated %}
+      <form method="POST" class="form-comentario">
+        {{ form_comentario.csrf_token }}
+        <input type="hidden" name="id_projeto" value="{{ projeto.id }}">
+        {{ form_comentario.texto(rows=3, placeholder="Deixe seu comentário...", class="input", id="campo-comentario") }}
+        {{ form_comentario.botao_comentario(class="botao-login") }}
+      </form>
+      <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const campo = document.getElementById("campo-comentario");
+  if (!campo) return;
+
+  const formulario = campo.closest("form");
+
+  campo.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (campo.value.trim() !== "") {
+        formulario.submit();
+      }
+    }
+  });
+});
+</script>
+
+    {% endif %}
+  </div>
+</section>
+
+<!-- Modal + Navegação -->
+<div id="popup-img" onclick="fecharImagem()" style="
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  flex-direction: column;
+">
+  <button onclick="imagemAnterior(event)" style="position: absolute; left: 2%; font-size: 2rem; color: white; background: none; border: none; cursor: pointer;">⟵</button>
+  <img id="imagem-popup" src="" alt="Imagem ampliada" style="
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 12px;
+    object-fit: contain;
+    background: #fff;
+  ">
+  <button onclick="imagemProxima(event)" style="position: absolute; right: 2%; font-size: 2rem; color: white; background: none; border: none; cursor: pointer;">⟶</button>
+</div>
+
+<script>
+let imagensProjeto = [
+  {% for midia in projeto.midias if midia.tipo.lower() in ['jpg', 'jpeg', 'png'] %}
+    "{{ url_for('static', filename='projetos_midias/' ~ midia.nome_arquivo) }}",
+  {% endfor %}
+];
+let imagemAtual = 0;
+
+function abrirImagem(src, index) {
+  imagemAtual = index;
+  document.getElementById("imagem-popup").src = src;
+  document.getElementById("popup-img").style.display = "flex";
+}
+function fecharImagem() {
+  document.getElementById("popup-img").style.display = "none";
+}
+function imagemAnterior(event) {
+  event.stopPropagation();
+  imagemAtual = (imagemAtual - 1 + imagensProjeto.length) % imagensProjeto.length;
+  document.getElementById("imagem-popup").src = imagensProjeto[imagemAtual];
+}
+function imagemProxima(event) {
+  event.stopPropagation();
+  imagemAtual = (imagemAtual + 1) % imagensProjeto.length;
+  document.getElementById("imagem-popup").src = imagensProjeto[imagemAtual];
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') fecharImagem();
+  else if (e.key === 'ArrowRight') imagemProxima(e);
+  else if (e.key === 'ArrowLeft') imagemAnterior(e);
+});
+</script>
+{% endblock %}
