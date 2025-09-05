@@ -11,74 +11,9 @@ Feed da Taverna
   <section class="container">
     <h1>Feed principal</h1>
 
-    <!-- 🔍 Barra de busca com filtros unificados -->
-    <form method="GET" action="{{ url_for('feed') }}" class="form-busca-tag">
-      <label for="tag-busca" class="sr-only">Buscar por palavra-chave</label>
-      <input
-        id="tag-busca"
-        type="text"
-        name="tag"
-        placeholder="Buscar por palavra-chave"
-        class="input-tag"
-        value="{{ tag_filtro or '' }}"
-      >
+    {% include "partials/filter_bar.html" %}
 
-        
-
-      <button type="submit" class="botao-busca">🔍 Filtrar</button>
-
-      {% if tag_filtro or categoria_filtro or ano_filtro %}
-        <a href="{{ url_for('feed') }}" class="botao-limpar-tag">Limpar</a>
-      {% endif %}
-    </form>
-
-    <!-- Rankings (mantido) -->
-    {% if tags_rank %}
-      <div class="ranking-tags">
-        <h3>🏆 Tags em Alta</h3>
-        <ul class="lista-tags">
-          {% for tag, count in tags_rank %}
-            <li>
-              <a href="{{ url_for('feed', tag=tag) }}" class="tag-ranking">
-                {{ tag }} <span class="badge">{{ count }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-
-    {% if categorias_rank %}
-      <div class="ranking-tags">
-        <h3>📚 Categorias Populares</h3>
-        <ul class="lista-tags">
-          {% for cat, count in categorias_rank %}
-            <li>
-              <a href="{{ url_for('feed', categoria=cat) }}" class="tag-ranking">
-                {{ cat }} <span class="badge">{{ count }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-
-    {% if anos_rank %}
-      <div class="ranking-tags">
-        <h3>🏫 Anos Escolares em Destaque</h3>
-        <ul class="lista-tags">
-          {% for ano, count in anos_rank %}
-            <li>
-              <a href="{{ url_for('feed', ano=ano) }}" class="tag-ranking">
-                {{ ano }} <span class="badge">{{ count }}</span>
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-
-    <!-- 📂 Lista de projetos -->
+    <!-- Lista de projetos -->
     <div class="linha-feed">
       {% for projeto in projetos %}
         <div class="card-feed">
@@ -136,6 +71,89 @@ Feed da Taverna
         <p>Nenhum projeto encontrado.</p>
       {% endfor %}
     </div>
+
+    {% if pagination and pagination.pages > 1 %}
+      <div class="paginacao">
+        {% if pagination.has_prev %}
+          <a href="{{ url_for('feed', page=pagination.prev_num, **request.args.to_dict(flat=False)) }}">Anterior</a>
+        {% endif %}
+        <span>Página {{ pagination.page }} de {{ pagination.pages }}</span>
+        {% if pagination.has_next %}
+          <a href="{{ url_for('feed', page=pagination.next_num, **request.args.to_dict(flat=False)) }}">Próxima</a>
+        {% endif %}
+      </div>
+    {% endif %}
   </section>
+
+  <script>
+  (function(){
+    const form = document.getElementById('filter-form');
+    const hidden = document.getElementById('hidden-fields');
+    const chips = document.querySelectorAll('.chip-btn');
+
+    function rebuildHidden(){
+      hidden.innerHTML = '';
+      document.querySelectorAll('.chip-active').forEach(ch => {
+        const name = ch.dataset.name;
+        const value = ch.dataset.value;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;   // múltiplos valores -> getlist()
+        input.value = value;
+        hidden.appendChild(input);
+      });
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('chip-active');
+        chip.classList.toggle('chip');
+        rebuildHidden();
+      });
+    });
+
+    // Autocomplete de usuários
+    const search = document.getElementById('user-search');
+    const box = document.getElementById('user-suggestions');
+    let timer;
+
+    function renderSuggestions(items){
+      if (!items.length){ box.classList.add('hidden'); return; }
+      box.innerHTML = items.map(u => `
+        <button type="button" class="w-full text-left px-3 py-2 hover:bg-gray-100"
+                data-name="${u.name}" data-email="${u.email}">
+          <div class="font-medium">${u.name}</div>
+          <div class="text-xs text-gray-500">${u.email}</div>
+        </button>
+      `).join('');
+      box.classList.remove('hidden');
+
+      box.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+          search.value = btn.dataset.name;
+          box.classList.add('hidden');
+        });
+      });
+    }
+
+    async function fetchUsers(q){
+      try{
+        const r = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`);
+        if(!r.ok) return renderSuggestions([]);
+        const data = await r.json();
+        renderSuggestions(data.results || []);
+      }catch(e){ renderSuggestions([]); }
+    }
+
+    search.addEventListener('input', () => {
+      clearTimeout(timer);
+      const q = search.value.trim();
+      if (q.length < 2){ box.classList.add('hidden'); return; }
+      timer = setTimeout(() => fetchUsers(q), 180);
+    });
+
+    rebuildHidden();
+  })();
+  </script>
 </body>
 {% endblock %}

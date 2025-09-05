@@ -1,0 +1,81 @@
+<!-- Filter Bar centralizado -->
+<div class="w-full max-w-6xl mx-auto">
+  <form id="filter-form" class="bg-white/70 backdrop-blur rounded-2xl shadow p-4 md:p-6 space-y-4"
+        method="GET" action="{{ url_for('feed') }}">
+
+    <!-- Busca por perfis -->
+    <div class="flex flex-col md:flex-row md:items-center gap-3">
+      <label for="user-search" class="text-sm font-medium text-gray-700 shrink-0">
+        Buscar perfis
+      </label>
+      <div class="relative w-full">
+        <input id="user-search" name="q_user" type="text"
+               placeholder="Digite nome ou e-mail"
+               class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               autocomplete="off" value="{{ request.args.get('q_user','') }}">
+        <div id="user-suggestions"
+             class="absolute z-20 mt-1 w-full rounded-xl border bg-white shadow hidden max-h-60 overflow-auto"></div>
+      </div>
+    </div>
+
+    <!-- Chips multi-seleção -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <div class="text-sm font-semibold mb-2">Anos Escolares em Destaque</div>
+        <div class="flex flex-wrap gap-2">
+          {% for year in years %}
+            {% set active = year|string in request.args.getlist('year') %}
+            <button type="button"
+                    class="chip-btn {{ 'chip-active' if active else 'chip' }}"
+                    data-name="year" data-value="{{ year }}">{{ year }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <div class="text-sm font-semibold mb-2">Categorias Populares</div>
+        <div class="flex flex-wrap gap-2">
+          {% for c in categories %}
+            {% set active = c in request.args.getlist('category') %}
+            <button type="button"
+                    class="chip-btn {{ 'chip-active' if active else 'chip' }}"
+                    data-name="category" data-value="{{ c }}">{{ c }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div>
+        <div class="text-sm font-semibold mb-2">Tags em Alta</div>
+        <div class="flex flex-wrap gap-2">
+          {% for t in tags %}
+            {% set active = t in request.args.getlist('tag') %}
+            <button type="button"
+                    class="chip-btn {{ 'chip-active' if active else 'chip' }}"
+                    data-name="tag" data-value="{{ t }}">#{{ t }}</button>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div id="hidden-fields"></div>
+
+    <div class="flex items-center justify-between pt-2">
+      <div class="text-xs text-gray-500">
+        Dica: combine vários filtros ao mesmo tempo.
+      </div>
+      <div class="flex gap-2">
+        <a href="{{ url_for('feed') }}"
+           class="rounded-xl border px-4 py-2 text-sm">Limpar</a>
+        <button type="submit"
+                class="rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm hover:bg-indigo-700">
+          Aplicar filtros
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<style>
+  .chip{ @apply rounded-full border border-gray-300 px-3 py-1 text-sm hover:border-indigo-400; }
+  .chip-active{ @apply rounded-full bg-indigo-600 text-white px-3 py-1 text-sm; }
+</style>
