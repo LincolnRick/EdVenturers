@@ -10,6 +10,7 @@ from flask import render_template, url_for, redirect, request, abort
 from flask_login import login_required, login_user, logout_user, current_user
 import os
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 
 from taverna.utils import (
     get_ranking_de_tags,
@@ -115,38 +116,47 @@ def perfil(id_usuario):
     )
 
 
-# ---------------- Feed Global (com filtro por tags) ----------------
+# ---------------- Feed Global com filtros unificados ----------------
 @app.route("/feed", methods=["GET", "POST"])
 @login_required
 def feed():
     form_comentario = FormComentario()
 
-    # Filtros
-    tag_filtro = request.args.get("tag", "").strip()
-    categoria_filtro = request.args.get("categoria", "").strip()
-    ano_filtro = request.args.get("ano", "").strip()
+    # Opções de filtros
+    years = [ano for ano, _ in get_ranking_de_anos(limit=20)]
+    categories = [cat for cat, _ in get_ranking_de_categorias(limit=20)]
+    tags = [tag for tag, _ in get_ranking_de_tags(limit=30)]
+
+    # Valores selecionados
+    sel_years = request.args.getlist('year')
+    sel_cats = request.args.getlist('category')
+    sel_tags = request.args.getlist('tag')
+    q_user = request.args.get('q_user', '').strip()
 
     # Base da query
     query = Projeto.query
 
-    if tag_filtro:
-        query = query.filter(Projeto.tags.ilike(f"%{tag_filtro}%"))
-    if categoria_filtro:
-        query = query.filter(Projeto.categoria == categoria_filtro)
-    if ano_filtro:
-        query = query.filter(Projeto.ano_escolar == ano_filtro)
+    if sel_years:
+        query = query.filter(Projeto.ano_escolar.in_(sel_years))
+    if sel_cats:
+        query = query.filter(Projeto.categoria.in_(sel_cats))
+    if sel_tags:
+        filtros_tag = [Projeto.tags.ilike(f"%{t}%") for t in sel_tags]
+        query = query.filter(or_(*filtros_tag))
+    if q_user:
+        query = query.join(Usuario).filter(
+            or_(Usuario.username.ilike(f"%{q_user}%"), Usuario.email.ilike(f"%{q_user}%"))
+        )
 
-    projetos = query.order_by(Projeto.data_criacao.desc()).all()
+    page = int(request.args.get('page', 1))
+    per_page = 12
+    pagination = query.order_by(Projeto.data_criacao.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    projetos = pagination.items
 
     niveis_autores = {
         projeto.autor.id: calcular_nivel(projeto.autor.pontos)[0]
         for projeto in projetos
     }
-
-    # Rankings
-    tags_rank = get_ranking_de_tags()
-    categorias_rank = get_ranking_de_categorias()
-    anos_rank = get_ranking_de_anos()
 
     if form_comentario.validate_on_submit():
         id_midia = int(request.form["id_midia"])
@@ -160,18 +170,16 @@ def feed():
         if usuario:
             usuario.pontos = (usuario.pontos or 0) + 2
         database.session.commit()
-        return redirect(url_for("feed", tag=tag_filtro or None, categoria=categoria_filtro or None, ano=ano_filtro or None))
+        return redirect(url_for("feed", **request.args.to_dict(flat=False)))
 
     return render_template(
         "feed.html",
         projetos=projetos,
         form_comentario=form_comentario,
-        tag_filtro=tag_filtro,
-        categoria_filtro=categoria_filtro,
-        ano_filtro=ano_filtro,
-        tags_rank=tags_rank,
-        categorias_rank=categorias_rank,
-        anos_rank=anos_rank,
+        years=years,
+        categories=categories,
+        tags=tags,
+        pagination=pagination,
         niveis_autores=niveis_autores
     )
 

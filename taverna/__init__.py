@@ -39,4 +39,7 @@ login_manager.login_view = "homepage"
 from upgrade_banco import upgrade as upgrade_banco
 upgrade_banco()
 
+from taverna.api.routes import api
+app.register_blueprint(api)
+
 from taverna import routes
