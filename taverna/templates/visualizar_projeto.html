@@ -43,13 +43,11 @@
     <section class="lg:col-span-2 space-y-6">
 
       {# MÍDIA VISUAL #}
-      {% set visual_media = [m for m in project.media if (m.mime_type and (m.mime_type.startswith('image/') or m.mime_type.startswith('video/'))) ] %}
       {% if visual_media|length > 0 %}
         {% include 'partials/carousel.html' %}
       {% endif %}
 
       {# ANEXOS (NÃO-IMAGEM) #}
-      {% set attachments = [m for m in project.media if (not m.mime_type) or (not (m.mime_type.startswith('image/') or m.mime_type.startswith('video/'))) ] %}
       {% if attachments|length > 0 %}
         {% include 'partials/attachments.html' %}
       {% endif %}
