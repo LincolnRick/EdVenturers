@@ -22,7 +22,7 @@
           {{ form.arquivos(class="input", multiple=True) }}
         </div>
 
-        {{ form.botao_confirmacao('Salvar alterações' if projeto else 'Enviar Projeto', class="botao-login") }}
+        {{ form.botao_confirmacao(value='Salvar alterações' if projeto else 'Enviar Projeto', class="botao-login") }}
       </form>
   </section>
 </body>
