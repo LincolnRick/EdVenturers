@@ -274,6 +274,27 @@ def visualizar_projeto(id_projeto):
         })
     projeto.media = midias
 
+    visual_media = [
+        m
+        for m in projeto.media
+        if m.get("mime_type")
+        and (
+            m["mime_type"].startswith("image/")
+            or m["mime_type"].startswith("video/")
+        )
+    ]
+    attachments = [
+        m
+        for m in projeto.media
+        if not (
+            m.get("mime_type")
+            and (
+                m["mime_type"].startswith("image/")
+                or m["mime_type"].startswith("video/")
+            )
+        )
+    ]
+
     if form_comentario.validate_on_submit():
         novo_comentario = ComentarioProjeto(
             texto=form_comentario.texto.data,
@@ -292,7 +313,9 @@ def visualizar_projeto(id_projeto):
         "visualizar_projeto.html",
         project=projeto,
         comments=projeto.comentarios,
-        form=form_comentario
+        form=form_comentario,
+        visual_media=visual_media,
+        attachments=attachments,
     )
 
 
