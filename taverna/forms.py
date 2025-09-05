@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import (
     StringField, PasswordField, SubmitField, TextAreaField, MultipleFileField, RadioField
 )
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError, Optional
 from taverna.models import Usuario
 
 # ---------- Formulário de Login ----------
@@ -98,9 +98,20 @@ class FormProjeto(FlaskForm):
     
     tags = StringField("Tags (mínimo 1)", validators=[DataRequired(), Length(min=2)])
 
-    arquivos = MultipleFileField("Arquivos", validators=[
-    FileAllowed(['jpg', 'jpeg', 'png', 'mp4', 'pdf', 'doc', 'docx', 'ppt', 'pptx'], "Tipos permitidos.")
-])
+    arquivos = MultipleFileField(
+        "Arquivos",
+        validators=[
+            Optional(),
+            FileAllowed(
+                ['jpg', 'jpeg', 'png', 'mp4', 'pdf', 'doc', 'docx', 'ppt', 'pptx'],
+                "Tipos permitidos."
+            )
+        ],
+    )
+
+    def validate_arquivos(self, field):
+        # Remove entradas vazias para evitar falha de validação
+        field.data = [f for f in field.data if f and getattr(f, "filename", "")]
     
     botao_confirmacao = SubmitField("Enviar Projeto")
 
