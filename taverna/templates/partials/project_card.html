@@ -1,0 +1,30 @@
+<article class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden group">
+  <a href="{{ url_for('visualizar_projeto', id_projeto=project.id) }}" class="block">
+    <div class="relative">
+      {% set cover = (project.media[0].filepath if project.media and project.media|length>0 else 'fotos_site/lontra-croft.png') %}
+      <img src="{{ url_for('static', filename=cover) }}" alt="Capa do projeto {{ project.title }}" class="w-full h-44 object-cover group-hover:scale-[1.02] transition-transform" loading="lazy" decoding="async">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
+    </div>
+    <div class="p-4 space-y-2">
+      <h3 class="text-base md:text-lg font-semibold text-gray-900 line-clamp-2 text-center">{{ project.title }}</h3>
+      <div class="text-xs text-gray-500 text-center">por {{ project.author_name }}</div>
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="inline-flex items-center rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5 text-xs">{{ project.category_name }}</span>
+        <span class="inline-flex items-center rounded-full bg-amber-50 text-amber-700 px-2 py-0.5 text-xs">{{ project.grade_year_label }}</span>
+      </div>
+      {% if project.tags %}
+      <div class="flex flex-wrap gap-1 pt-1 justify-center">
+        {% for t in project.tags[:3] %}
+          <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] text-gray-700">#{{ t.name }}</span>
+        {% endfor %}
+        {% if project.tags|length > 3 %}
+          <span class="text-[11px] text-gray-500">+{{ project.tags|length - 3 }}</span>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </a>
+  <div class="px-4 pb-4 text-center">
+    <a href="{{ url_for('visualizar_projeto', id_projeto=project.id) }}" class="inline-flex items-center rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Ver projeto</a>
+  </div>
+</article>
