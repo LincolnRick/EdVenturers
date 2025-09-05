@@ -289,7 +289,7 @@ def visualizar_projeto(id_projeto):
         return redirect(url_for("visualizar_projeto", id_projeto=projeto.id))
 
     return render_template(
-        "projects/detail.html",
+        "visualizar_projeto.html",
         project=projeto,
         comments=projeto.comentarios,
         form=form_comentario
