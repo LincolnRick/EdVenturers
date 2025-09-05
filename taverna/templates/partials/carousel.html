@@ -13,8 +13,20 @@
         {% elif m.mime_type and m.mime_type.startswith('image/') or (not m.mime_type) %}
           <img class="ev-carousel__media" src="{{ src }}" alt="{{ m.alt or ('Imagem do projeto ' ~ _title) }}" loading="lazy" decoding="async">
         {% else %}
+          {% set ext = (m.alt or '').split('.')[-1].lower() %}
+          {% set icons = {
+            'pdf': 'lontra-pdf.png',
+            'doc': 'lontra-docx.png',
+            'docx': 'lontra-docx.png',
+            'ppt': 'lontra-croft.png',
+            'pptx': 'lontra-croft.png',
+            'csv': 'lontra-csv.png',
+            'xlsx': 'lontra-xlsx.png'
+          } %}
+          {% set icon = icons.get(ext, 'lontra-croft.png') %}
           <div class="ev-carousel__fallback">
-            Arquivo não visualizável. <a href="{{ src }}" target="_blank" rel="noopener">Abrir arquivo</a>
+            <img src="{{ url_for('static', filename='fotos_site/' ~ icon) }}" alt="Arquivo {{ m.alt }}" class="w-20 h-20 object-contain mb-2">
+            <a href="{{ src }}" target="_blank" rel="noopener" class="text-indigo-600 hover:underline">{{ m.alt }}</a>
           </div>
         {% endif %}
       </li>

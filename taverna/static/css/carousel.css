@@ -3,7 +3,7 @@
 .ev-carousel__track{display:flex;gap:12px;will-change:transform;transition:transform .35s ease}
 .ev-carousel__slide{flex:0 0 100%;position:relative}
 .ev-carousel__media{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9;border-radius:12px;display:block}
-.ev-carousel__fallback{display:flex;align-items:center;justify-content:center;min-height:220px;background:#fafafa;border-radius:12px;color:#6b7280}
+.ev-carousel__fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:220px;padding:16px;text-align:center;background:#fafafa;border-radius:12px;color:#6b7280}
 .ev-carousel__nav{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:999px;border:none;background:rgba(17,24,39,.6);color:#fff;font-size:22px;display:grid;place-items:center;cursor:pointer}
 .ev-carousel__nav:focus{outline:2px solid #6366f1;outline-offset:2px}
 .ev-carousel__nav--prev{left:10px}
