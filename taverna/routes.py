@@ -11,7 +11,8 @@ from flask_login import login_required, login_user, logout_user, current_user
 import os
 import mimetypes
 from werkzeug.utils import secure_filename
-from sqlalchemy import or_
+from sqlalchemy import or_, func
+import re
 
 from taverna.utils import (
     get_ranking_de_tags,
@@ -121,18 +122,24 @@ def perfil(id_usuario):
 @app.route("/feed", methods=["GET", "POST"])
 @login_required
 def feed():
-    form_comentario = FormComentario()
+    def slugify(txt):
+        return re.sub(r'[^a-z0-9]+', '-', txt.lower()).strip('-')
 
     # Opções de filtros
     years = [ano for ano, _ in get_ranking_de_anos(limit=20)]
-    categories = [cat for cat, _ in get_ranking_de_categorias(limit=20)]
-    tags = [tag for tag, _ in get_ranking_de_tags(limit=30)]
+    cat_counts = get_ranking_de_categorias(limit=20)
+    tag_counts = get_ranking_de_tags(limit=30)
+    cat_map = {slugify(cat): cat for cat, _ in cat_counts}
+    tag_map = {slugify(tag): tag for tag, _ in tag_counts}
+    categories = [{'slug': s, 'name': n} for s, n in cat_map.items()]
+    tags = [{'slug': s, 'name': n} for s, n in tag_map.items()]
 
     # Valores selecionados
     sel_years = request.args.getlist('year')
-    sel_cats = request.args.getlist('category')
-    sel_tags = request.args.getlist('tag')
+    sel_cats = [cat_map.get(c) for c in request.args.getlist('category') if cat_map.get(c)]
+    sel_tags = [tag_map.get(t) for t in request.args.getlist('tag') if tag_map.get(t)]
     q_user = request.args.get('q_user', '').strip()
+    sort = request.args.get('sort', 'new')
 
     # Base da query
     query = Projeto.query
@@ -149,39 +156,43 @@ def feed():
             or_(Usuario.username.ilike(f"%{q_user}%"), Usuario.email.ilike(f"%{q_user}%"))
         )
 
+    # Ordenação
+    if sort == 'old':
+        query = query.order_by(Projeto.data_criacao.asc())
+    elif sort == 'comments':
+        query = query.outerjoin(ComentarioProjeto).group_by(Projeto.id).order_by(func.count(ComentarioProjeto.id).desc())
+    elif sort == 'rating':
+        query = query.order_by(Projeto.data_criacao.desc())
+    else:
+        query = query.order_by(Projeto.data_criacao.desc())
+
     page = int(request.args.get('page', 1))
     per_page = 12
-    pagination = query.order_by(Projeto.data_criacao.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    projetos = pagination.items
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    projetos_db = pagination.items
 
-    niveis_autores = {
-        projeto.autor.id: calcular_nivel(projeto.autor.pontos)[0]
-        for projeto in projetos
-    }
-
-    if form_comentario.validate_on_submit():
-        id_midia = int(request.form["id_midia"])
-        novo_comentario = Comentario(
-            texto=form_comentario.texto.data,
-            id_usuario=current_user.id,
-            id_midia=id_midia
-        )
-        database.session.add(novo_comentario)
-        usuario = Usuario.query.get(current_user.id)
-        if usuario:
-            usuario.pontos = (usuario.pontos or 0) + 2
-        database.session.commit()
-        return redirect(url_for("feed", **request.args.to_dict(flat=False)))
+    projetos = []
+    for p in projetos_db:
+        media = [{'filepath': f"projetos_midias/{m.nome_arquivo}"} for m in p.midias]
+        tags_list = [{'name': t.strip()} for t in p.tags.split(',')] if p.tags else []
+        projetos.append({
+            'id': p.id,
+            'title': p.titulo,
+            'author_name': p.autor.username if p.autor else '',
+            'category_name': p.categoria,
+            'grade_year_label': p.ano_escolar,
+            'tags': tags_list,
+            'media': media,
+        })
 
     return render_template(
         "feed.html",
-        projetos=projetos,
-        form_comentario=form_comentario,
+        projects=projetos,
         years=years,
         categories=categories,
         tags=tags,
         pagination=pagination,
-        niveis_autores=niveis_autores
+        sort=sort,
     )
 
 

@@ -1,159 +1,143 @@
 {% extends "homepage.html" %}
 
-{% block titulo %}
-Feed da Taverna
-{% endblock %}
+{% block titulo %}Feed principal{% endblock %}
 
 {% block body %}
 <body>
   {% include "navbar.html" %}
 
-  <section class="container">
-    <h1>Feed principal</h1>
+<div class="max-w-6xl mx-auto px-4 md:px-6 py-8">
+  <header class="text-center mb-6">
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Feed principal</h1>
+    <p class="text-sm text-gray-600 mt-1">Descubra projetos e filtre por anos, categorias, tags e perfis.</p>
+  </header>
 
-    {% include "partials/filter_bar.html" %}
+  <!-- Barra de ordenação (preserva filtros) -->
+  <form id="sort-form" method="GET" action="{{ url_for('feed') }}" class="flex items-center justify-end gap-2 mb-3">
+    {% for y in request.args.getlist('year') %}<input type="hidden" name="year" value="{{ y }}">{% endfor %}
+    {% for c in request.args.getlist('category') %}<input type="hidden" name="category" value="{{ c }}">{% endfor %}
+    {% for t in request.args.getlist('tag') %}<input type="hidden" name="tag" value="{{ t }}">{% endfor %}
+    {% if request.args.get('q_user') %}<input type="hidden" name="q_user" value="{{ request.args.get('q_user') }}">{% endif %}
+    <label for="sort" class="text-sm text-gray-600">Ordenar por</label>
+    <select id="sort" name="sort" class="rounded-xl border px-3 py-1.5 text-sm" onchange="this.form.submit()">
+      <option value="new" {{ 'selected' if sort=='new' }}>Mais recentes</option>
+      <option value="old" {{ 'selected' if sort=='old' }}>Mais antigos</option>
+      <option value="comments" {{ 'selected' if sort=='comments' }}>Mais comentados</option>
+      <option value="rating" {{ 'selected' if sort=='rating' }}>Melhor avaliados</option>
+    </select>
+  </form>
 
-    <!-- Lista de projetos -->
-    <div class="linha-feed">
-      {% for projeto in projetos %}
-        <div class="card-feed">
-          <h2>{{ projeto.titulo }}</h2>
-          <p><strong>Autor:</strong>
-            <a href="{{ url_for('perfil', id_usuario=projeto.autor.id) }}">{{ projeto.autor.username }}</a>
-            <span class="badge-nivel">Lv {{ niveis_autores[projeto.autor.id] }}</span>
-          </p>
-          <p><strong>Descrição:</strong> {{ projeto.descricao }}</p>
-
-          <div class="tags">
-            <span class="tag-item">{{ projeto.categoria }}</span>
-            <span class="tag-item">{{ projeto.ano_escolar }}</span>
-            {% if projeto.tags %}
-              {% for tag in projeto.tags.split(',') %}
-                <span class="tag-item">{{ tag.strip() }}</span>
-              {% endfor %}
-            {% endif %}
-          </div>
-
-          <p><a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}">Ver projeto completo</a></p>
-
-          <!-- Mídias vinculadas -->
-          {% if projeto.midias %}
-            {% set f = projeto.midias[0] %}
-            {% set extensao = f.nome_arquivo.split('.')[-1].lower() %}
-            {% set icones = {
-              'pdf': 'lontra-pdf.png',
-              'doc': 'lontra-docx.png',
-              'docx': 'lontra-docx.png',
-              'ppt': 'lontra-croft.png',
-              'pptx': 'lontra-croft.png',
-              'csv': 'lontra-csv.png',
-              'xlsx': 'lontra-xlsx.png'
-            } %}
-            {% set icone = icones.get(extensao, 'lontra-croft.png') %}
-
-            {% if extensao in ['jpg', 'jpeg', 'png'] %}
-              <img src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" class="imagem-feed" alt="Mídia do projeto {{ projeto.titulo }}">
-            {% elif extensao == 'mp4' %}
-              <video controls class="imagem-feed">
-                <source src="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" type="video/mp4">
-              </video>
-            {% else %}
-              <div class="arquivo-generico">
-                <img src="{{ url_for('static', filename='fotos_site/' ~ icone) }}" class="imagem-feed" alt="Arquivo {{ f.nome_arquivo }}">
-                <a href="{{ url_for('static', filename='projetos_midias/' ~ f.nome_arquivo) }}" target="_blank">
-                  {{ f.nome_arquivo }}
-                </a>
-              </div>
-            {% endif %}
-          {% endif %}
+  <!-- Filter Bar central -->
+  <div class="bg-white rounded-2xl shadow p-4 md:p-6">
+    <form id="filter-form" method="GET" action="{{ url_for('feed') }}" class="space-y-4">
+      <!-- busca de perfis -->
+      <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <label class="text-sm font-medium text-gray-700 shrink-0" for="user-search">Buscar perfis</label>
+        <div class="relative w-full">
+          <input id="user-search" name="q_user" type="text" placeholder="Digite nome ou e-mail"
+                 class="w-full rounded-xl border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                 autocomplete="off" value="{{ request.args.get('q_user','') }}">
+          <div id="user-suggestions"
+               class="absolute z-20 mt-1 w-full rounded-xl border bg-white shadow hidden max-h-60 overflow-auto"></div>
         </div>
-      {% else %}
-        <p>Nenhum projeto encontrado.</p>
+      </div>
+
+      <!-- chips -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- anos -->
+        <div>
+          <div class="text-sm font-semibold mb-2">Anos Escolares em Destaque</div>
+          <div class="flex flex-wrap gap-2">
+            {% for year in years %}
+              {% set active = year|string in request.args.getlist('year') %}
+              <button type="button" class="chip-btn {{ 'chip-active' if active else 'chip' }}" data-name="year" data-value="{{ year }}">{{ year }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- categorias -->
+        <div>
+          <div class="text-sm font-semibold mb-2">Categorias Populares</div>
+          <div class="flex flex-wrap gap-2">
+            {% for c in categories %}
+              {% set active = c.slug in request.args.getlist('category') %}
+              <button type="button" class="chip-btn {{ 'chip-active' if active else 'chip' }}" data-name="category" data-value="{{ c.slug }}">{{ c.name }}</button>
+            {% endfor %}
+          </div>
+        </div>
+        <!-- tags -->
+        <div>
+          <div class="text-sm font-semibold mb-2">Tags em Alta</div>
+          <div class="flex flex-wrap gap-2">
+            {% for t in tags %}
+              {% set active = t.slug in request.args.getlist('tag') %}
+              <button type="button" class="chip-btn {{ 'chip-active' if active else 'chip' }}" data-name="tag" data-value="{{ t.slug }}">#{{ t.name }}</button>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- filtros ativos -->
+      <div id="active-filters" class="flex flex-wrap items-center gap-2">
+        <!-- preenchido via JS a partir dos chips ativos -->
+      </div>
+
+      <!-- hidden inputs dinâmicos -->
+      <div id="hidden-fields"></div>
+
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">Dica: combine vários filtros ao mesmo tempo.</span>
+        <div class="flex gap-2">
+          <a href="{{ url_for('feed') }}" class="rounded-xl border px-4 py-2 text-sm">Limpar</a>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-4 py-2 text-sm hover:bg-indigo-700">Aplicar filtros</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- estado vazio -->
+  {% if not projects %}
+    <div class="mt-8 rounded-2xl bg-white p-10 text-center shadow">
+      <div class="text-4xl mb-2">🗂️</div>
+      <h2 class="text-lg font-semibold">Nenhum projeto encontrado</h2>
+      <p class="text-gray-600">Tente remover alguns filtros ou alterar a ordenação.</p>
+    </div>
+  {% else %}
+
+    <!-- skeleton -->
+    <div id="feed-skeleton" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      {% for _ in range(6) %}<div class="animate-pulse bg-white rounded-2xl shadow p-4 h-64"></div>{% endfor %}
+    </div>
+
+    <!-- grid de cards -->
+    <div id="feed-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+      {% for project in projects %}
+        {% include 'partials/project_card.html' %}
       {% endfor %}
     </div>
 
-    {% if pagination and pagination.pages > 1 %}
-      <div class="paginacao">
+    <!-- paginação -->
+    <nav class="mt-8 flex justify-center" aria-label="Paginação">
+      <ul class="inline-flex items-center gap-2">
         {% if pagination.has_prev %}
-          <a href="{{ url_for('feed', page=pagination.prev_num, **request.args.to_dict(flat=False)) }}">Anterior</a>
+          <li><a class="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50"
+                 href="{{ url_for('feed', page=pagination.prev_num, sort=sort, **request.args.to_dict(flat=False)) }}">Anterior</a></li>
         {% endif %}
-        <span>Página {{ pagination.page }} de {{ pagination.pages }}</span>
+        <li class="text-sm text-gray-600">Página {{ pagination.page }} de {{ pagination.pages }}</li>
         {% if pagination.has_next %}
-          <a href="{{ url_for('feed', page=pagination.next_num, **request.args.to_dict(flat=False)) }}">Próxima</a>
+          <li><a class="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50"
+                 href="{{ url_for('feed', page=pagination.next_num, sort=sort, **request.args.to_dict(flat=False)) }}">Próxima</a></li>
         {% endif %}
-      </div>
-    {% endif %}
-  </section>
+      </ul>
+    </nav>
+  {% endif %}
+</div>
 
-  <script>
-  (function(){
-    const form = document.getElementById('filter-form');
-    const hidden = document.getElementById('hidden-fields');
-    const chips = document.querySelectorAll('.chip-btn');
+<!-- estilos dos chips -->
+<style>
+  .chip{border-radius:9999px;border:1px solid #d1d5db;padding:0.25rem 0.75rem;font-size:0.875rem;transition:border-color .2s;}
+  .chip:hover{border-color:#818cf8;}
+  .chip-active{border-radius:9999px;background-color:#4f46e5;color:#fff;padding:0.25rem 0.75rem;font-size:0.875rem;}
+</style>
 
-    function rebuildHidden(){
-      hidden.innerHTML = '';
-      document.querySelectorAll('.chip-active').forEach(ch => {
-        const name = ch.dataset.name;
-        const value = ch.dataset.value;
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;   // múltiplos valores -> getlist()
-        input.value = value;
-        hidden.appendChild(input);
-      });
-    }
-
-    chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        chip.classList.toggle('chip-active');
-        chip.classList.toggle('chip');
-        rebuildHidden();
-      });
-    });
-
-    // Autocomplete de usuários
-    const search = document.getElementById('user-search');
-    const box = document.getElementById('user-suggestions');
-    let timer;
-
-    function renderSuggestions(items){
-      if (!items.length){ box.classList.add('hidden'); return; }
-      box.innerHTML = items.map(u => `
-        <button type="button" class="w-full text-left px-3 py-2 hover:bg-gray-100"
-                data-name="${u.name}" data-email="${u.email}">
-          <div class="font-medium">${u.name}</div>
-          <div class="text-xs text-gray-500">${u.email}</div>
-        </button>
-      `).join('');
-      box.classList.remove('hidden');
-
-      box.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          search.value = btn.dataset.name;
-          box.classList.add('hidden');
-        });
-      });
-    }
-
-    async function fetchUsers(q){
-      try{
-        const r = await fetch(`/api/users/search?q=${encodeURIComponent(q)}`);
-        if(!r.ok) return renderSuggestions([]);
-        const data = await r.json();
-        renderSuggestions(data.results || []);
-      }catch(e){ renderSuggestions([]); }
-    }
-
-    search.addEventListener('input', () => {
-      clearTimeout(timer);
-      const q = search.value.trim();
-      if (q.length < 2){ box.classList.add('hidden'); return; }
-      timer = setTimeout(() => fetchUsers(q), 180);
-    });
-
-    rebuildHidden();
-  })();
-  </script>
 </body>
 {% endblock %}
