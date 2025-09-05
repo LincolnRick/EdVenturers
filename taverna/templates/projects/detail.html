@@ -122,17 +122,21 @@
           {% endif %}
         </dl>
 
+        {% if current_user.is_authenticated and current_user.id == project.autor.id %}
         <div class="mt-5 flex gap-2">
-          <a href="{{ url_for('novo_projeto') }}" class="flex-1 rounded-xl border px-3 py-2 text-center hover:bg-gray-50">Editar</a>
+          <a href="{{ url_for('editar_projeto', id_projeto=project.id) }}" class="flex-1 rounded-xl border px-3 py-2 text-center hover:bg-gray-50">Editar</a>
           <button type="button" class="flex-1 rounded-xl bg-rose-600 text-white px-3 py-2 hover:bg-rose-700" data-open="delete-modal">Excluir</button>
         </div>
+        {% endif %}
       </div>
 
       <!-- Action bar sticky (mobile) -->
+      {% if current_user.is_authenticated and current_user.id == project.autor.id %}
       <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t p-3 flex gap-2">
-        <a href="{{ url_for('novo_projeto') }}" class="flex-1 rounded-xl border px-3 py-2 text-center">Editar</a>
+        <a href="{{ url_for('editar_projeto', id_projeto=project.id) }}" class="flex-1 rounded-xl border px-3 py-2 text-center">Editar</a>
         <button type="button" class="flex-1 rounded-xl bg-rose-600 text-white px-3 py-2" data-open="delete-modal">Excluir</button>
       </div>
+      {% endif %}
     </aside>
   </div>
 </div>

@@ -211,6 +211,50 @@ def novo_projeto():
 
     return render_template("novo_projeto.html", form=form_projeto)
 
+@app.route("/projeto/<int:id_projeto>/editar", methods=["GET", "POST"])
+@login_required
+def editar_projeto(id_projeto):
+    projeto = Projeto.query.get_or_404(id_projeto)
+    if projeto.id_usuario != current_user.id:
+        abort(403)
+
+    form_projeto = FormProjeto()
+    if form_projeto.validate_on_submit():
+        projeto.titulo = form_projeto.titulo.data
+        projeto.descricao = form_projeto.descricao.data
+        projeto.conteudo = form_projeto.conteudo.data
+        projeto.categoria = form_projeto.categoria.data
+        projeto.ano_escolar = form_projeto.ano_escolar.data
+        projeto.tags = form_projeto.tags.data
+
+        arquivos = form_projeto.arquivos.data or []
+        for arquivo in arquivos:
+            if arquivo and arquivo.filename:
+                nome_seguro = secure_filename(arquivo.filename)
+                dir_midias = os.path.join(app.root_path, 'static', 'projetos_midias')
+                os.makedirs(dir_midias, exist_ok=True)
+                caminho = os.path.join(dir_midias, nome_seguro)
+                arquivo.save(caminho)
+                extensao = nome_seguro.rsplit('.', 1)[-1].lower()
+                midia = Midia(
+                    nome_arquivo=nome_seguro,
+                    tipo=extensao,
+                    id_projeto=projeto.id,
+                    id_usuario=current_user.id
+                )
+                database.session.add(midia)
+        database.session.commit()
+        return redirect(url_for("visualizar_projeto", id_projeto=projeto.id))
+    elif request.method == "GET":
+        form_projeto.titulo.data = projeto.titulo
+        form_projeto.descricao.data = projeto.descricao
+        form_projeto.conteudo.data = projeto.conteudo
+        form_projeto.categoria.data = projeto.categoria
+        form_projeto.ano_escolar.data = projeto.ano_escolar
+        form_projeto.tags.data = projeto.tags
+
+    return render_template("novo_projeto.html", form=form_projeto, projeto=projeto)
+
 @app.route("/projeto/<int:id_projeto>", methods=["GET", "POST"])
 @login_required
 def visualizar_projeto(id_projeto):
