@@ -5,11 +5,30 @@
 {% block body %}
 {% include "navbar.html" %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind_fallback.css') }}">
-<div class="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-10">
+<style>
+  .max-w-6xl{max-width:72rem;margin-left:auto;margin-right:auto;}
+  .text-gray-400{color:#9ca3af;}
+  .bg-gray-100{background-color:#f3f4f6;}
+  .mx-2{margin-left:0.5rem;margin-right:0.5rem;}
+  .divide-y > :not(:last-child){border-bottom:1px solid #e5e7eb;}
+  .rounded{border-radius:0.25rem;}
+  .w-9{width:2.25rem;}
+  .h-9{height:2.25rem;}
+  .flex-wrap{flex-wrap:wrap;}
+  .border-b{border-bottom:1px solid #e5e7eb;}
+  .text-xs{font-size:0.75rem;}
+  .bg-black\/40{background-color:rgba(0,0,0,0.4);}
+  @media(min-width:1024px){
+    .lg\:col-span-2{grid-column:span 2/span 2;}
+    .lg\:col-span-1{grid-column:span 1/span 1;}
+    .lg\:hidden{display:none;}
+  }
+</style>
+<div class="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10">
   <!-- Breadcrumb -->
-  <nav class="text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
+  <nav class="text-sm text-gray-500 mb-3" aria-label="breadcrumb">
     <a href="{{ url_for('feed') }}" class="hover:underline">Feed</a>
-    <span class="mx-2">/</span>
+    <span class="mx-2 text-gray-400">›</span>
     <span class="text-gray-700" aria-current="page">{{ project.titulo }}</span>
   </nav>
 
@@ -18,16 +37,24 @@
     <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ project.titulo }}</h1>
   </header>
 
-  <!-- Grid principal -->
+  <!-- GRID PRINCIPAL -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-    <!-- Coluna Conteúdo (lg:2) -->
+    <!-- COLUNA ESQUERDA (conteúdo) -->
     <section class="lg:col-span-2 space-y-6">
-      <!-- Galeria -->
-      {% if project.media and project.media|length > 0 %}
-        {% include "partials/carousel.html" %}
+
+      {# MÍDIA VISUAL #}
+      {% set visual_media = [m for m in project.media if (m.mime_type and (m.mime_type.startswith('image/') or m.mime_type.startswith('video/'))) ] %}
+      {% if visual_media|length > 0 %}
+        {% include 'partials/carousel.html' %}
       {% endif %}
 
-      <!-- Descrição/Conteúdo -->
+      {# ANEXOS (NÃO-IMAGEM) #}
+      {% set attachments = [m for m in project.media if (not m.mime_type) or (not (m.mime_type.startswith('image/') or m.mime_type.startswith('video/'))) ] %}
+      {% if attachments|length > 0 %}
+        {% include 'partials/attachments.html' %}
+      {% endif %}
+
+      <!-- DESCRIÇÃO / CONTEÚDO -->
       <article class="bg-white rounded-2xl shadow p-6 prose prose-indigo max-w-none">
         <h2 class="text-xl font-semibold mb-3">Descrição</h2>
         <p class="!my-0 text-gray-700">{{ project.descricao or 'Sem descrição.' }}</p>
@@ -39,20 +66,19 @@
         {% endif %}
       </article>
 
-      <!-- Comentários -->
-      <section class="bg-white rounded-2xl shadow">
+      <!-- COMENTÁRIOS -->
+      <section class="bg-white rounded-2xl shadow overflow-hidden">
         <header class="border-b px-6 py-4 flex items-center gap-2">
           <span aria-hidden="true">💬</span>
           <h2 class="text-lg font-semibold">Comentários</h2>
           <span class="ml-auto text-sm text-gray-500">{{ comments|length }} comentário(s)</span>
         </header>
-
         <div class="p-6 space-y-4">
           {% if comments %}
             <ul class="space-y-4">
               {% for c in comments %}
               <li class="flex gap-3">
-                <img src="{{ url_for('static', filename='avatares/' ~ (c.usuario.avatar or 'default.png')) }}" class="w-10 h-10 rounded-full" alt="Avatar">
+                <img src="{{ url_for('static', filename='avatares/' ~ (c.usuario.avatar or 'default.png')) }}" class="w-10 h-10 rounded-full" alt="Avatar de {{ c.usuario.username }}">
                 <div class="flex-1">
                   <div class="flex items-center gap-2">
                     <strong class="text-gray-900">{{ c.usuario.username }}</strong>
@@ -67,7 +93,6 @@
             <div class="text-center text-gray-500">Nenhum comentário ainda.</div>
           {% endif %}
 
-          <!-- Formulário -->
           <form method="POST" action="{{ url_for('visualizar_projeto', id_projeto=project.id) }}" class="space-y-3">
             {{ form.csrf_token }}
             <label class="sr-only" for="comment">Deixe seu comentário</label>
@@ -78,9 +103,10 @@
           </form>
         </div>
       </section>
+
     </section>
 
-    <!-- Coluna Metadados -->
+    <!-- COLUNA DIREITA (metadados + ações) -->
     <aside class="lg:col-span-1 space-y-6">
       <div class="bg-white rounded-2xl shadow p-5">
         <div class="flex items-center gap-3 mb-4">
@@ -120,8 +146,8 @@
         {% endif %}
       </div>
 
-      <!-- Action bar sticky (mobile) -->
       {% if current_user.is_authenticated and current_user.id == project.autor.id %}
+      <!-- Action bar sticky (mobile) -->
       <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur border-t p-3 flex gap-2">
         <a href="{{ url_for('editar_projeto', id_projeto=project.id) }}" class="flex-1 rounded-xl border px-3 py-2 text-center">Editar</a>
         <button type="button" class="flex-1 rounded-xl bg-rose-600 text-white px-3 py-2" data-open="delete-modal">Excluir</button>
@@ -133,7 +159,7 @@
 
 <!-- Modal excluir -->
 <div id="delete-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="del-title">
-  <div class="absolute inset-0 bg-black/40"></div>
+  <div class="absolute inset-0 bg-black/40" data-close="delete-modal"></div>
   <div class="relative mx-auto mt-24 max-w-md bg-white rounded-2xl shadow p-6">
     <h3 id="del-title" class="text-lg font-semibold mb-2">Excluir projeto?</h3>
     <p class="text-sm text-gray-600 mb-4">Essa ação não pode ser desfeita.</p>
@@ -145,37 +171,23 @@
   </div>
 </div>
 
-<!-- Lightbox simples -->
-<div id="lightbox" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/70" role="dialog" aria-modal="true">
-  <img id="lightbox-img" src="" alt="Mídia ampliada" class="max-h-full max-w-full rounded-xl">
-</div>
-
 <script>
-  // Enable/disable botão comentar
-  const textarea = document.getElementById('comment');
-  const btn = document.getElementById('btn-comment');
-  if (textarea && btn) {
-    textarea.addEventListener('input', () => {
-      btn.disabled = textarea.value.trim().length < 2;
-    });
-  }
+  // Habilitar botão "Comentar" só quando há texto
+  (function(){
+    const ta = document.getElementById('comment');
+    const btn = document.getElementById('btn-comment');
+    if (ta && btn) {
+      const sync = ()=> btn.disabled = ta.value.trim().length < 2;
+      ta.addEventListener('input', sync); sync();
+    }
+  })();
   // Modal excluir
-  const openers = document.querySelectorAll('[data-open="delete-modal"]');
-  const closers = document.querySelectorAll('[data-close="delete-modal"]');
-  const modal = document.getElementById('delete-modal');
-  openers.forEach(o => o.addEventListener('click', ()=> modal.classList.remove('hidden')));
-  closers.forEach(c => c.addEventListener('click', ()=> modal.classList.add('hidden')));
-  modal?.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.add('hidden'); });
-
-  // Lightbox
-  const lb = document.getElementById('lightbox');
-  const lbImg = document.getElementById('lightbox-img');
-  document.querySelectorAll('[data-modal-image]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      lbImg.src = btn.getAttribute('data-modal-image');
-      lb.classList.remove('hidden');
-    });
-  });
-  lb.addEventListener('click', () => lb.classList.add('hidden'));
+  (function(){
+    const modal = document.getElementById('delete-modal');
+    document.querySelectorAll('[data-open="delete-modal"]').forEach(b => b.addEventListener('click', ()=> modal.classList.remove('hidden')));
+    document.querySelectorAll('[data-close="delete-modal"]').forEach(b => b.addEventListener('click', ()=> modal.classList.add('hidden')));
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') modal.classList.add('hidden'); });
+    modal?.addEventListener('click', (e)=>{ if(e.target.classList.contains('bg-black/40')) modal.classList.add('hidden'); });
+  })();
 </script>
 {% endblock %}

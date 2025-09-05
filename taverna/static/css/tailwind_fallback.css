@@ -107,3 +107,16 @@
 
 /* basic utility for sr-only */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.max-w-6xl{max-width:72rem;margin-left:auto;margin-right:auto;}
+.text-gray-400{color:#9ca3af;}
+.bg-gray-100{background-color:#f3f4f6;}
+.mx-2{margin-left:0.5rem;margin-right:0.5rem;}
+.divide-y > :not(:last-child){border-bottom:1px solid #e5e7eb;}
+.rounded{border-radius:0.25rem;}
+.w-9{width:2.25rem;}
+.h-9{height:2.25rem;}
+.flex-wrap{flex-wrap:wrap;}
+.border-b{border-bottom:1px solid #e5e7eb;}
+.text-xs{font-size:0.75rem;}
+.bg-black\/40{background-color:rgba(0,0,0,0.4);}
+@media(min-width:1024px){.lg\:col-span-2{grid-column:span 2/span 2;}.lg\:col-span-1{grid-column:span 1/span 1;}.lg\:hidden{display:none;}}

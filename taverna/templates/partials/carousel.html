@@ -1,8 +1,9 @@
-{% set _title = project.title or 'Galeria do projeto' %}
+{% set _media = visual_media if visual_media is defined else project.media %}
+{% set _title = (project.title or project.titulo) or 'Galeria do projeto' %}
 <div class="ev-carousel" role="region" aria-roledescription="carousel" aria-label="Galeria: {{ _title }}">
   <div class="ev-carousel__viewport" data-ev-carousel>
     <ul class="ev-carousel__track">
-      {% for m in project.media %}
+      {% for m in _media %}
       <li class="ev-carousel__slide" data-index="{{ loop.index0 }}">
         {% set src = url_for('static', filename=m.filepath) if m.filepath and not m.filepath.startswith('http') else m.filepath %}
         {% if m.mime_type and m.mime_type.startswith('video/') %}
@@ -39,7 +40,7 @@
   <button class="ev-carousel__nav ev-carousel__nav--next" type="button" aria-label="Próximo slide" data-ev-next>&rsaquo;</button>
 
   <div class="ev-carousel__dots" role="tablist" aria-label="Indicadores de slides">
-    {% for m in project.media %}
+    {% for m in _media %}
     <button class="ev-carousel__dot" role="tab" aria-label="Ir para slide {{ loop.index }}" aria-controls="slide-{{ loop.index }}" data-ev-dot="{{ loop.index0 }}"></button>
     {% endfor %}
   </div>
