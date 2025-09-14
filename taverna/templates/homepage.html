@@ -11,6 +11,9 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/carousel.css') }}">
+  <!-- Utilidades do Tailwind (CDN) e fallback local -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind_fallback.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
 
   <script defer src="{{ url_for('static', filename='js/carousel.js') }}"></script>
