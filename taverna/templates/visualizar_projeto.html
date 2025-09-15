@@ -47,8 +47,36 @@
         {% include 'partials/carousel.html' %}
       {% endif %}
 
-      {# ANEXOS (NÃO-IMAGEM) #}
-      {% if attachments|length > 0 %}
+      {# ÁUDIOS E ANEXOS #}
+      {% set ns = namespace(audios=[], outros=[]) %}
+      {% for a in attachments %}
+        {% if a.mime_type and a.mime_type.startswith('audio/') %}
+          {% set _ = ns.audios.append(a) %}
+        {% else %}
+          {% set _ = ns.outros.append(a) %}
+        {% endif %}
+      {% endfor %}
+
+      {% if ns.audios %}
+        <section class="bg-white rounded-2xl shadow p-6">
+          <h2 class="text-lg font-semibold mb-3">Áudios</h2>
+          <ul class="space-y-4">
+            {% for a in ns.audios %}
+              {% set src = url_for('static', filename=a.filepath) if a.filepath and not a.filepath.startswith('http') else a.filepath %}
+              <li>
+                <audio controls class="w-full">
+                  <source src="{{ src }}" type="{{ a.mime_type }}">
+                  Seu navegador não suporta áudio. <a href="{{ src }}" target="_blank" rel="noopener">Ouvir áudio</a>
+                </audio>
+                <div class="text-xs text-gray-500 mt-1">{{ a.original_name or a.alt }}</div>
+              </li>
+            {% endfor %}
+          </ul>
+        </section>
+      {% endif %}
+
+      {% if ns.outros %}
+        {% set attachments = ns.outros %}
         {% include 'partials/attachments.html' %}
       {% endif %}
 

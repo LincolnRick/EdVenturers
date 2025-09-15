@@ -13,6 +13,11 @@
           </video>
         {% elif m.mime_type and m.mime_type.startswith('image/') or (not m.mime_type) %}
           <img class="ev-carousel__media" src="{{ src }}" alt="{{ m.alt or ('Imagem do projeto ' ~ _title) }}" loading="lazy" decoding="async">
+        {% elif m.mime_type and m.mime_type.startswith('audio/') %}
+          <audio class="ev-carousel__media" controls preload="metadata" aria-label="{{ m.alt or ('Áudio - ' ~ _title) }}">
+            <source src="{{ src }}" type="{{ m.mime_type }}">
+            Seu navegador não suporta áudio. <a href="{{ src }}" target="_blank" rel="noopener">Ouvir áudio</a>
+          </audio>
         {% else %}
           {% set ext = (m.alt or '').split('.')[-1].lower() %}
           {% set icons = {
