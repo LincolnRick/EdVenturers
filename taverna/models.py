@@ -22,6 +22,7 @@ class Usuario(database.Model, UserMixin):
     midias = database.relationship("Midia", backref="usuario", lazy=True)
     comentarios_midia = database.relationship("Comentario", backref="usuario", lazy=True)
     comentarios_projeto = database.relationship("ComentarioProjeto", backref="usuario", lazy=True)
+    curtidas = database.relationship('Curtida', backref='usuario', lazy=True)
 
 
 # ---------- Modelo de Projeto ----------
@@ -41,6 +42,7 @@ class Projeto(database.Model):
     # Relacionamentos
     midias = database.relationship('Midia', backref='projeto', lazy=True)
     comentarios = database.relationship('ComentarioProjeto', backref='projeto', lazy=True)
+    curtidas = database.relationship('Curtida', backref='projeto', lazy=True)
 
 # ---------- Modelo de Mídia (Imagens, Vídeos, Docs, etc.) ----------
 class Midia(database.Model):
@@ -77,3 +79,15 @@ class Comentario(database.Model):
 
     id_usuario = database.Column(database.Integer, database.ForeignKey('usuario.id'), nullable=False)
     id_midia = database.Column(database.Integer, database.ForeignKey('midia.id'), nullable=False)
+
+
+# ---------- Modelo de Curtidas ----------
+class Curtida(database.Model):
+    __tablename__ = 'curtida'
+    __table_args__ = (database.UniqueConstraint('id_usuario', 'id_projeto'),)
+
+    id = database.Column(database.Integer, primary_key=True)
+    id_usuario = database.Column(database.Integer, database.ForeignKey('usuario.id'), nullable=False)
+    id_projeto = database.Column(database.Integer, database.ForeignKey('projeto.id'), nullable=False)
+    data_criacao = database.Column(database.DateTime, default=datetime.utcnow)
+
