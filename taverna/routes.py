@@ -341,6 +341,16 @@ def visualizar_projeto(id_projeto):
         database.session.commit()
         return redirect(url_for("visualizar_projeto", id_projeto=projeto.id))
 
+    like_count = len(projeto.curtidas)
+    liked = False
+    if current_user.is_authenticated:
+        liked = (
+            Curtida.query.filter_by(
+                id_usuario=current_user.id, id_projeto=id_projeto
+            ).first()
+            is not None
+        )
+
     return render_template(
         "visualizar_projeto.html",
         project=projeto,
@@ -348,6 +358,8 @@ def visualizar_projeto(id_projeto):
         form=form_comentario,
         visual_media=visual_media,
         attachments=attachments,
+        like_count=like_count,
+        liked=liked,
     )
 
 

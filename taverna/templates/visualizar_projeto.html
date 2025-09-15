@@ -163,6 +163,14 @@
           </div>
           {% endif %}
         </dl>
+        <div class="mt-5">
+          <button id="like-btn" data-project-id="{{ project.id }}" data-auth="{{ 'true' if current_user.is_authenticated else 'false' }}"
+                  class="w-full flex items-center justify-center gap-1 rounded-xl border px-3 py-2 hover:bg-gray-50">
+            <svg class="w-5 h-5 {{ 'text-red-500' if liked else 'text-gray-500' }}"
+                 viewBox="0 0 24 24" fill="{{ 'currentColor' if liked else 'none' }}" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.25c0-2.485-2.131-4.5-4.76-4.5-1.688 0-3.24.86-4.24 2.22-1-1.36-2.552-2.22-4.24-2.22C3.131 3.75 1 5.765 1 8.25c0 7.056 8.25 11.25 11 11.25 2.75 0 11-4.194 11-11.25z" /></svg>
+            <span id="like-count">{{ like_count }}</span>
+          </button>
+        </div>
 
         {% if current_user.is_authenticated and current_user.id == project.autor.id %}
         <div class="mt-5 flex gap-2">
@@ -214,6 +222,34 @@
     document.querySelectorAll('[data-close="delete-modal"]').forEach(b => b.addEventListener('click', ()=> modal.classList.add('hidden')));
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') modal.classList.add('hidden'); });
     modal?.addEventListener('click', (e)=>{ if(e.target.classList.contains('bg-black/40')) modal.classList.add('hidden'); });
+  })();
+  // Curtidas
+  (function(){
+    const btn = document.getElementById('like-btn');
+    if(btn){
+      btn.addEventListener('click', async () => {
+        const auth = btn.dataset.auth === 'true';
+        if(!auth){
+          window.location.href = "{{ url_for('homepage') }}";
+          return;
+        }
+        const id = btn.dataset.projectId;
+        try{
+          const resp = await fetch(`/projetos/${id}/curtir`, {method:'POST'});
+          if(!resp.ok) return;
+          const data = await resp.json();
+          document.getElementById('like-count').textContent = data.count;
+          const svg = btn.querySelector('svg');
+          if(data.liked){
+            svg.setAttribute('fill','currentColor');
+            svg.classList.add('text-red-500');
+          }else{
+            svg.setAttribute('fill','none');
+            svg.classList.remove('text-red-500');
+          }
+        }catch(e){console.error(e);}
+      });
+    }
   })();
 </script>
 {% endblock %}
