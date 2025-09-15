@@ -210,7 +210,19 @@ def feed():
 def taverna():
     ranking_usuarios = Usuario.query.order_by(Usuario.pontos.desc()).limit(5).all()
     niveis = {u.id: calcular_nivel(u.pontos)[0] for u in ranking_usuarios}
-    return render_template("taverna.html", ranking_usuarios=ranking_usuarios, niveis=niveis)
+    top_projetos = (
+        Projeto.query.outerjoin(Curtida)
+        .group_by(Projeto.id)
+        .order_by(func.count(Curtida.id).desc())
+        .limit(5)
+        .all()
+    )
+    return render_template(
+        "taverna.html",
+        ranking_usuarios=ranking_usuarios,
+        niveis=niveis,
+        top_projetos=top_projetos,
+    )
 
 @app.route("/missoes")
 def missoes():

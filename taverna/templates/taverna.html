@@ -22,5 +22,18 @@ Bem vindo a taverna
         {% endfor %}
         </ol>
     </section>
+    <section class="top-projetos">
+        <h2>Projetos mais curtidos</h2>
+        <ol>
+        {% for projeto in top_projetos %}
+            <li>
+              <a href="{{ url_for('visualizar_projeto', id_projeto=projeto.id) }}">{{ projeto.titulo }}</a>
+              - {{ projeto.curtidas|length }} curtidas
+            </li>
+        {% else %}
+            <li>Nenhum projeto encontrado.</li>
+        {% endfor %}
+        </ol>
+    </section>
 </body>
 {% endblock %}
