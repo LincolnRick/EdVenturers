@@ -27,7 +27,7 @@
           {% set icon = icons.get(ext, 'lontra-croft.png') %}
           <div class="ev-carousel__fallback">
             <img src="{{ url_for('static', filename='fotos_site/' ~ icon) }}" alt="Arquivo {{ m.alt }}" class="w-20 h-20 object-contain mb-2">
-            <a href="{{ src }}" target="_blank" rel="noopener" class="text-indigo-600 hover:underline">{{ m.alt }}</a>
+            <a href="{{ src }}" target="_blank" rel="noopener" download class="text-indigo-600 hover:underline">{{ m.alt }}</a>
           </div>
         {% endif %}
       </li>
