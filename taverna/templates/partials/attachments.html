@@ -21,7 +21,7 @@
           <div class="truncate font-medium text-gray-900" title="{{ filename }}">{{ filename }}</div>
           <div class="text-xs text-gray-500">{{ a.mime_type or 'arquivo' }}{% if a.size_kb %} • {{ a.size_kb }} KB{% endif %}</div>
         </div>
-        <a href="{{ href }}" target="_blank" rel="noopener" class="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Abrir</a>
+        <a href="{{ href }}" target="_blank" rel="noopener" download class="rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Abrir</a>
       </li>
     {% endfor %}
   </ul>

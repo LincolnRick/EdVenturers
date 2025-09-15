@@ -46,8 +46,8 @@ class FormCriarConta(FlaskForm):
 class FormFoto(FlaskForm):
     foto = FileField("Arquivo", validators=[
         DataRequired(),
-        FileAllowed(['jpg', 'png', 'pdf', 'docx', 'pptx', 'mp4'], 
-                    "Formatos permitidos: .jpg, .png, .pdf, .docx, .pptx, .mp4")
+        FileAllowed(['jpg', 'png', 'pdf', 'docx', 'pptx', 'mp4', 'csv', 'xlsx'],
+                    "Formatos permitidos: .jpg, .png, .pdf, .docx, .pptx, .mp4, .csv, .xlsx")
     ])
     tags = StringField("Tags (separadas por vírgula)")
     botao_confirmacao = SubmitField("Enviar")
@@ -103,7 +103,7 @@ class FormProjeto(FlaskForm):
         validators=[
             Optional(),
             FileAllowed(
-                ['jpg', 'jpeg', 'png', 'mp4', 'pdf', 'doc', 'docx', 'ppt', 'pptx'],
+                ['jpg', 'jpeg', 'png', 'mp4', 'pdf', 'doc', 'docx', 'ppt', 'pptx', 'csv', 'xlsx'],
                 "Tipos permitidos."
             )
         ],
