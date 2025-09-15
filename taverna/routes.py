@@ -4,9 +4,9 @@ from taverna.forms import (
     FormComentario, FormComentarioProjeto
 )
 from taverna.models import (
-    Usuario, Projeto, Comentario, ComentarioProjeto, Midia
+    Usuario, Projeto, Comentario, ComentarioProjeto, Midia, Curtida
 )
-from flask import render_template, url_for, redirect, request, abort
+from flask import render_template, url_for, redirect, request, abort, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 import os
 import mimetypes
@@ -386,6 +386,23 @@ def deletar_projeto(id_projeto):
 
     database.session.commit()
     return redirect(url_for("perfil", id_usuario=current_user.id))
+
+
+@app.route('/projetos/<int:proj_id>/curtir', methods=['POST'])
+@login_required
+def curtir_projeto(proj_id):
+    Projeto.query.get_or_404(proj_id)
+    curtida = Curtida.query.filter_by(id_usuario=current_user.id, id_projeto=proj_id).first()
+    if curtida:
+        database.session.delete(curtida)
+        liked = False
+    else:
+        nova_curtida = Curtida(id_usuario=current_user.id, id_projeto=proj_id)
+        database.session.add(nova_curtida)
+        liked = True
+    database.session.commit()
+    total = Curtida.query.filter_by(id_projeto=proj_id).count()
+    return jsonify({'liked': liked, 'count': total})
 
 @app.route('/sponsors')
 def sponsors():
