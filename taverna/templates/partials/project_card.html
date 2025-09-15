@@ -24,7 +24,44 @@
       {% endif %}
     </div>
   </a>
-  <div class="px-4 pb-4 text-center">
-    <a href="{{ url_for('visualizar_projeto', id_projeto=project.id) }}" class="inline-flex items-center rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Ver projeto</a>
-  </div>
-</article>
+    <div class="px-4 pb-4 flex items-center justify-between">
+      <button type="button" class="like-btn inline-flex items-center gap-1 rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50" data-project-id="{{ project.id }}" data-auth="{{ 'true' if current_user.is_authenticated else 'false' }}">
+        <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8.25c0-2.485-2.131-4.5-4.76-4.5-1.688 0-3.24.86-4.24 2.22-1-1.36-2.552-2.22-4.24-2.22C3.131 3.75 1 5.765 1 8.25c0 7.056 8.25 11.25 11 11.25 2.75 0 11-4.194 11-11.25z" /></svg>
+        <span class="like-count">{{ project.like_count }}</span>
+      </button>
+      <a href="{{ url_for('visualizar_projeto', id_projeto=project.id) }}" class="inline-flex items-center rounded-xl border px-3 py-1.5 text-sm hover:bg-gray-50">Ver projeto</a>
+    </div>
+  </article>
+{% if loop is not defined or loop.last %}
+<script>
+  if(!window.__likeInit){
+    window.__likeInit = true;
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const auth = btn.dataset.auth === 'true';
+          if(!auth){
+            window.location.href = "{{ url_for('homepage') }}";
+            return;
+          }
+          const id = btn.dataset.projectId;
+          try{
+            const resp = await fetch(`/projetos/${id}/curtir`, {method:'POST'});
+            if(!resp.ok) return;
+            const data = await resp.json();
+            btn.querySelector('.like-count').textContent = data.count;
+            const svg = btn.querySelector('svg');
+            if(data.liked){
+              svg.setAttribute('fill','currentColor');
+              svg.classList.add('text-red-500');
+            }else{
+              svg.setAttribute('fill','none');
+              svg.classList.remove('text-red-500');
+            }
+          }catch(e){console.error(e);}
+        });
+      });
+    });
+  }
+</script>
+{% endif %}
