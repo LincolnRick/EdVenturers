@@ -160,9 +160,17 @@ def feed():
     if sort == 'old':
         query = query.order_by(Projeto.data_criacao.asc())
     elif sort == 'comments':
-        query = query.outerjoin(ComentarioProjeto).group_by(Projeto.id).order_by(func.count(ComentarioProjeto.id).desc())
+        query = (
+            query.outerjoin(ComentarioProjeto)
+            .group_by(Projeto.id)
+            .order_by(func.count(ComentarioProjeto.id).desc())
+        )
     elif sort == 'rating':
-        query = query.order_by(Projeto.data_criacao.desc())
+        query = (
+            query.outerjoin(Curtida)
+            .group_by(Projeto.id)
+            .order_by(func.count(Curtida.id).desc())
+        )
     else:
         query = query.order_by(Projeto.data_criacao.desc())
 
@@ -183,6 +191,7 @@ def feed():
             'grade_year_label': p.ano_escolar,
             'tags': tags_list,
             'media': media,
+            'like_count': len(p.curtidas),
         })
 
     return render_template(
