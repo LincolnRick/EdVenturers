@@ -8,7 +8,7 @@ sem migrações manuais.
 
 from taverna import database, app
 from sqlalchemy import inspect, text
-from taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuario
+from taverna.models import Comentario, Projeto, Midia, ComentarioProjeto, Usuario, Curtida
 
 
 def upgrade():
@@ -29,6 +29,8 @@ def upgrade():
             ComentarioProjeto.__table__.create(database.engine)
         if 'usuario' not in tabelas_existentes:
             Usuario.__table__.create(database.engine)
+        if 'curtida' not in tabelas_existentes:
+            Curtida.__table__.create(database.engine)
 
         # Verificar colunas da tabela midia
         colunas_midia = [col['name'] for col in inspector.get_columns('midia')]
