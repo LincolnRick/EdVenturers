@@ -1,8 +1,14 @@
-from taverna import app
-from taverna.routes import *
+try:
+    from taverna import app
+except Exception:
+    try:
+        from taverna import create_app
+        app = create_app()
+    except Exception:
+        from flask import Flask
+        app = Flask(__name__)
 
-# os cadastros utilizarão "SQL ALCHEMY DO FLASK"
-# os formulários utilizarão "WTF FORMS FLASK"
+from taverna.routes import *
 
 import os
 
